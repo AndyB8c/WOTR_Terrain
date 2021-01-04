@@ -1,0 +1,20 @@
+"AS"= Created using amplify shader. 
+
+Polygonmaker-AS-Ice: Translucid shader with Refraction.
+	-Diffuse with Alpha for opacity
+	-Sliders to control opacity,refraction and Chromatic Aberration
+	-Color to control the Transmission (SSS effect)
+	
+Polygonmaker-AS-Skin Defered: Shader with color tint mask (R,G,B) and Fresnel color to simulate hair
+Polygonmaker-AS-Skin Forward: Shader with color tint mask (R,G,B) and Fresnel color to simulate hair and Tranlucency
+
+Polygonmaker-AS-SkinCutout Defered DoubleSided: Same as above but for transparent materials.
+Polygonmaker-AS-SkinCutout Forward DoubleSided: Same as above but for transparent materials. 
+Polygonmaker-AS-SkinCutout Forward Specular DoubleSided: Same as above but for Specular pipeline.
+
+StandardDoubleSided=Unity Standard but double sided.(Default from Unity: Used on some Polygonmaker Renders)
+
+Polygonmaker_Toon:
+-Simple Shader to achieve "Unlit look"
+-Shaderforge Shader
+-Blinn-Phong Lighting
