@@ -1,4 +1,6 @@
-﻿Shader "Lux URP/Nature/Tree Creator Bark Optimized"
+﻿// Please note: This shader will never be batched as unity uses Materialpropertyblocks to write per instance properties.
+
+Shader "Lux URP/Nature/Tree Creator Bark Optimized"
 {
     Properties
     {
@@ -51,7 +53,6 @@
             Name "ForwardLit"
             Tags{"LightMode" = "UniversalForward"}
 
-
             ZWrite On
             Cull Back
 
@@ -59,8 +60,6 @@
             // Required to compile gles 2.0 with standard SRP library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-
-        //  Shader target needs to be 3.0 due to tex2Dlod in the vertex shader and VFACE
             #pragma target 2.0
 
             // -------------------------------------
@@ -78,13 +77,15 @@
 
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -95,11 +96,11 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
         //  Include base inputs and all other needed "base" includes
             #include "Includes/Lux URP Tree Creator Inputs.hlsl"
             #include "Includes/Lux URP Tree Creator Library.hlsl"
-
 
             #pragma vertex LitPassVertex
             #pragma fragment LitPassFragment
@@ -229,6 +230,9 @@
                 inputData.fogCoord = input.fogFactorAndVertexLight.x;
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
             }
 
             half4 LitPassFragment(VertexOutput input) : SV_Target
@@ -281,6 +285,7 @@
 
             ZWrite On
             ZTest LEqual
+            ColorMask 0
             Cull Back
 
             HLSLPROGRAM
@@ -359,7 +364,6 @@
         }
 
     //  Depth -----------------------------------------------------
-
         Pass
         {
             Tags{"LightMode" = "DepthOnly"}
@@ -426,6 +430,84 @@
                 #endif
 
                 return 0;
+            }
+
+            ENDHLSL
+        }
+
+    //  DepthNormal -----------------------------------------------------
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+
+            #pragma shader_feature _ENABLEDITHERING
+            #pragma multi_compile __ BILLBOARD_FACE_CAMERA_POS
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+            
+            #define DEPTHNORMALONLYPASS
+            #include "Includes/Lux URP Tree Creator Inputs.hlsl"
+            #include "Includes/Lux URP Tree Creator Library.hlsl"
+
+            VertexOutput DepthNormalsVertex(VertexInput input)
+            {
+                VertexOutput output = (VertexOutput)0;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+
+                TreeVertLeaf(input);
+
+                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
+
+                #if defined(BILLBOARD_FACE_CAMERA_POS) && defined(_ENABLEDITHERING)
+                    output.screenPos = ComputeScreenPos(output.positionCS);
+                #endif
+
+                VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS, float4(1,1,1,1)); //input.tangentOS);
+                output.normalWS.xyz = NormalizeNormalPerVertex(normalInput.normalWS).xyz;
+
+
+                return output;
+            }
+
+            half4 DepthNormalsFragment(VertexOutput input) : SV_TARGET
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
+            //  Dither
+                #if defined(BILLBOARD_FACE_CAMERA_POS) && defined(_ENABLEDITHERING)
+                    half coverage = 1.0h;
+                    half dither = UNITY_ACCESS_INSTANCED_PROP(Props, _TreeInstanceColor).a; 
+                    [branch]
+                    if ( dither < 1.0h) {
+                        coverage = ComputeAlphaCoverage(input.screenPos, dither );
+                    }
+                    clip (coverage);
+                #endif
+
+                float3 normal = input.normalWS.xyz;
+                return float4(PackNormalOctRectEncode(TransformWorldToViewDir(normal, true)), 0.0, 0.0);
             }
 
             ENDHLSL

@@ -146,7 +146,7 @@ void Lighting_half(
 
         half4 sampleNormal = SAMPLE_TEXTURE2D(normalMap, sampler_Normal, UV);
         half3 normalTS = UnpackNormalScale(sampleNormal, bumpScale);
-        
+
     //  Get specular normal
         half3 snormalWS = TransformTangentToWorld(normalTS, ToW);
         snormalWS = NormalizeNormalPerPixel(snormalWS);
@@ -164,7 +164,6 @@ void Lighting_half(
         }
     //  Set specular normal
         normalWS = snormalWS;
-        
     }
     else {
        normalWS = NormalizeNormalPerPixel(normalWS);
@@ -182,9 +181,34 @@ void Lighting_half(
         bakedGI = SampleSH(diffuseNormalWS); 
     #endif
 
-
     BRDFData brdfData;
     InitializeBRDFData(albedo, metallic, specular, smoothness, alpha, brdfData);
+
+    float4 clipPos = TransformWorldToHClip(positionWS);
+
+//  Get Shadow Sampling Coords
+    #if SHADOWS_SCREEN
+        float4 shadowCoord = ComputeScreenPos(clipPos);
+    #else
+        float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
+    #endif
+
+    Light mainLight = GetMainLight(shadowCoord);
+    half3 mainLightColor = mainLight.color;
+
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        float4 ndc = clipPos * 0.5f;
+        float2 normalized = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;
+        normalized /= clipPos.w;
+        normalized *= _ScreenParams.xy;
+    //  We could also use IN.Screenpos(default) --> ( IN.Screenpos.xy * _ScreenParams.xy)
+    //  HDRP 10.1
+        normalized = GetNormalizedScreenSpaceUV(normalized);
+        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(normalized);
+        mainLight.color *= aoFactor.directAmbientOcclusion;
+        occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+    #endif
 
     FinalLighting = GlobalIllumination_Lux(brdfData, bakedGI, occlusion, normalWS, viewDirectionWS,     AmbientReflection);
 
@@ -193,15 +217,6 @@ void Lighting_half(
         FinalLighting += backScattering * SampleSH(-diffuseNormalWS) * albedo * occlusion * translucency.x * subsurfaceColor * skinMask;
     }
 
-//  Get Shadow Sampling Coords
-    #if SHADOWS_SCREEN
-        float4 clipPos = TransformWorldToHClip(positionWS);
-        float4 shadowCoord = ComputeScreenPos(clipPos);
-    #else
-        float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
-    #endif
-
-    Light mainLight = GetMainLight(shadowCoord);
     MixRealtimeAndBakedGI(mainLight, normalWS, bakedGI, half4(0, 0, 0, 0));
 
     half NdotLUnclamped = dot(diffuseNormalWS, mainLight.direction);
@@ -213,8 +228,10 @@ void Lighting_half(
     half3 transLightDir = mainLight.direction + normalWS * translucency.w;
     half transDot = dot( transLightDir, -viewDirectionWS );
     transDot = exp2(saturate(transDot) * transPower - transPower);
-    FinalLighting += skinMask * subsurfaceColor * transDot * (1.0 - saturate(NdotLUnclamped)) * mainLight.color * lerp(1.0h, mainLight.shadowAttenuation, translucency.z) * translucency.x;
+    FinalLighting += skinMask * subsurfaceColor * transDot * (1.0 - saturate(NdotLUnclamped)) * mainLightColor * lerp(1.0h, mainLight.shadowAttenuation, translucency.z) * translucency.x;
 
+//  URP 10
+    half4 shadowMask = half4(1, 1, 1, 1); 
 
     #ifdef _ADDITIONAL_LIGHTS
         uint pixelLightCount = GetAdditionalLightsCount();
@@ -223,28 +240,32 @@ void Lighting_half(
             //Light light = GetAdditionalLight(i, inputData.positionWS);
         //  Get index upfront as we need it for GetAdditionalLightShadowParams();
             int index = GetPerObjectLightIndex(i);
-            Light light = GetAdditionalPerObjectLight(index, positionWS);
+            // Light light = GetAdditionalPerObjectLight(index, positionWS); // here; shadowAttenuation = 1.0;
+        //  URP 10: We have to use the new GetAdditionalLight function
+            Light light = GetAdditionalLight(i, positionWS, shadowMask);
+            half3 lightColor = light.color;
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                light.color *= aoFactor.directAmbientOcclusion;
+            #endif
 
             half NdotLUnclamped = dot(diffuseNormalWS, light.direction);
             NdotL = saturate( dot(normalWS, light.direction) );
             FinalLighting += LightingPhysicallyBasedSkin(brdfData, light, normalWS, viewDirectionWS, NdotL, NdotLUnclamped, curvature, skinMask);
 
-half4 shadowParams = GetAdditionalLightShadowParams(index);
-light.color *= lerp(1, shadowParams.x, maskbyshadowstrength); // shadowParams.x == shadow strength, which is 0 for point lights
-
-        //  Subsurface Scattering
+        //  Transmission
+            half4 shadowParams = GetAdditionalLightShadowParams(index);
+            lightColor *= lerp(1, shadowParams.x, maskbyshadowstrength); // shadowParams.x == shadow strength, which is 0 for point lights
+            
             transLightDir = light.direction + normalWS * translucency.w;
             transDot = dot( transLightDir, -viewDirectionWS );
             transDot = exp2(saturate(transDot) * transPower - transPower);
-            FinalLighting += skinMask * subsurfaceColor * transDot * (1.0 - NdotL) * light.color * lerp(1.0h, light.shadowAttenuation, translucency.z) * light.distanceAttenuation * translucency.x;
+            FinalLighting += skinMask * subsurfaceColor * transDot * (1.0 - NdotL) * lightColor * lerp(1.0h, light.shadowAttenuation, translucency.z) * light.distanceAttenuation * translucency.x;
         }
     #endif
     #ifdef _ADDITIONAL_LIGHTS_VERTEX
 //        FinalLighting += inputData.vertexLighting * brdfData.diffuse;
     #endif
     FinalLighting += emission;
-
-    //FinalLighting = bakedGI;
 
 //  Set Albedo for meta pass
     #if defined(LIGHTWEIGHT_META_PASS_INCLUDED) || defined(UNIVERSAL_META_PASS_INCLUDED)
@@ -316,7 +337,8 @@ void Lighting_float(
         translucency, AmbientReflection, subsurfaceColor, curvature, skinMask, maskbyshadowstrength,
         backScattering,
         normalMap, sampler_Normal, UV, bumpScale, diffuseBias,
-        lightMapUV, MetaAlbedo, FinalLighting, MetaSpecular
+        lightMapUV,
+        MetaAlbedo, FinalLighting, MetaSpecular
     );
 }
 

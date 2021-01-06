@@ -194,7 +194,25 @@ half4 LuxURPClothFragmentPBR(InputData inputData, half3 albedo, half metallic, h
     #endif
     addData.sheenColor = sheenColor;
 
-    Light mainLight = GetMainLight(inputData.shadowCoord);
+//  ShadowMask: To ensure backward compatibility we have to avoid using shadowMask input, as it is not present in older shaders
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = inputData.shadowMask;
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    //Light mainLight = GetMainLight(inputData.shadowCoord);
+    Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS, shadowMask);
+    half3 mainLightColor = mainLight.color;
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(inputData.normalizedScreenSpaceUV);
+        mainLight.color *= aoFactor.directAmbientOcclusion;
+        occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+    #endif
+
     MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI, half4(0, 0, 0, 0));
 
     half NdotL = saturate(dot(inputData.normalWS, mainLight.direction ));
@@ -206,14 +224,20 @@ half4 LuxURPClothFragmentPBR(InputData inputData, half3 albedo, half metallic, h
         half3 transLightDir = mainLight.direction + inputData.normalWS * translucency.w;
         half transDot = dot( transLightDir, -inputData.viewDirectionWS );
         transDot = exp2(saturate(transDot) * transPower - transPower);
-        color += brdfData.diffuse * transDot * (1.0 - NdotL) * mainLight.color * lerp(1.0h, mainLight.shadowAttenuation, translucency.z) * translucency.x * 4;
+        color += brdfData.diffuse * transDot * (1.0h - NdotL) * mainLightColor * lerp(1.0h, mainLight.shadowAttenuation, translucency.z) * translucency.x * 4;
     #endif
 
     #ifdef _ADDITIONAL_LIGHTS
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i)
         {
-            Light light = GetAdditionalLight(i, inputData.positionWS);
+        //  Light light = GetAdditionalPerObjectLight(index, positionWS); // here; shadowAttenuation = 1.0;
+        //  URP 10: We have to use the new GetAdditionalLight function
+            Light light = GetAdditionalLight(i, inputData.positionWS, shadowMask);
+            half3 lightColor = light.color;
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                light.color *= aoFactor.directAmbientOcclusion;
+            #endif
             NdotL = saturate(dot(inputData.normalWS, light.direction ));
             color += LightingPhysicallyBased_LuxCloth(brdfData, addData, light, inputData.normalWS, inputData.viewDirectionWS, NdotL);
         //  translucency
@@ -222,7 +246,7 @@ half4 LuxURPClothFragmentPBR(InputData inputData, half3 albedo, half metallic, h
             transLightDir = light.direction + inputData.normalWS * translucency.w;
             transDot = dot( transLightDir, -inputData.viewDirectionWS );
             transDot = exp2(saturate(transDot) * transPower - transPower);
-            color += brdfData.diffuse * transDot * (1.0 - NdotL) * light.color * lerp(1.0h, light.shadowAttenuation, translucency.z) * light.distanceAttenuation  * translucency.x * 4;
+            color += brdfData.diffuse * transDot * (1.0h - NdotL) * lightColor * lerp(1.0h, light.shadowAttenuation, translucency.z) * light.distanceAttenuation * translucency.x * 4;
         #endif
         }
     #endif
@@ -232,8 +256,8 @@ half4 LuxURPClothFragmentPBR(InputData inputData, half3 albedo, half metallic, h
     #endif
 
     color += emission;
+
     return half4(color, alpha);
 }
-
 
 #endif

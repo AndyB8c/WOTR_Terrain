@@ -8,14 +8,14 @@ Shader "Lux URP/Human/Skin"
         [HeaderHelpLuxURP_URL(snoamqpqhtdl)]
         
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff(_RECEIVE_SHADOWS_OFF)]
         _ReceiveShadows             ("Receive Shadows", Float) = 1.0
         _SkinShadowBias             ("     Shadow Caster Bias", Range(.1, 1.0)) = 1.0
         _SkinShadowSamplingBias     ("     Shadow Sampling Bias", Range(0, 0.05)) = 0
         
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [NoScaleOffset] [MainTexture]
         _BaseMap                    ("Albedo (RGB) Smoothness (A)", 2D) = "white" {}
         [MainColor]
@@ -38,7 +38,7 @@ Shader "Lux URP/Human/Skin"
         [Toggle]_VertexNormal       ("          Use Vertex Normal for Diffuse", Float) = 1
 
         [Header(Skin Lighting)]
-        [Space(5)]
+        [Space(8)]
         [NoScaleOffset] _SSSAOMap   ("Skin Mask (R) Thickness (G) Curvature (B) Occlusion (A)", 2D) = "white" {}
         
         _OcclusionStrength          ("Occlusion Strength", Range(0.0, 1.0)) = 1.0
@@ -66,7 +66,7 @@ Shader "Lux URP/Human/Skin"
         [NoScaleOffset] _SkinLUT    ("Skin LUT", 2D) = "white" {}
 
         [Header(Distance Fading)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_DISTANCEFADE)]
         _EnableDistanceFade         ("Enable Distance Fade", Float) = 0.0
         [LuxURPDistanceFadeDrawer]
@@ -74,7 +74,7 @@ Shader "Lux URP/Human/Skin"
 
 
         [Header(Rim Lighting)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_RIMLIGHTING)]
         _Rim                        ("Enable Rim Lighting", Float) = 0
         [HDR] _RimColor             ("Rim Color", Color) = (0.5,0.5,0.5,1)
@@ -84,7 +84,7 @@ Shader "Lux URP/Human/Skin"
         _RimPerPositionFrequency    ("     Rim Per Position Frequency", Range(0.0, 1.0)) = 1
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff]
         _SpecularHighlights         ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
@@ -92,7 +92,7 @@ Shader "Lux URP/Human/Skin"
 
 
         [Header(Stencil)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _Stencil         ("Stencil Reference", Range (0, 255)) = 0
         [IntRange] _ReadMask        ("     Read Mask", Range (0, 255)) = 255
         [IntRange] _WriteMask       ("     Write Mask", Range (0, 255)) = 255
@@ -112,6 +112,10 @@ Shader "Lux URP/Human/Skin"
         [HideInInspector] _MainTex  ("Albedo", 2D) = "white" {}
         [HideInInspector] _Color    ("Color", Color) = (1,1,1,1)
         [HideInInspector] _Cutoff   ("Alpha Cutoff", Range(0.0, 1.0)) = 0.0
+
+    //  URP 10.1. needs this for the depthnormal pass 
+        [HideInInspector] _Cutoff   ("     Threshold", Range(0.0, 1.0)) = 0.5
+        [HideInInspector] _Surface("__surface", Float) = 0.0
     }
 
     SubShader
@@ -146,31 +150,31 @@ Shader "Lux URP/Human/Skin"
             // Required to compile gles 2.0 with standard SRP library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-
-        //  Shader target needs to be 3.0 due to tex2Dlod in the vertex shader and VFACE
             #pragma target 2.0
 
             // -------------------------------------
             // Material Keywords
             #define _SPECULAR_SETUP
-            #pragma shader_feature _NORMALMAP
-            #pragma shader_feature_local _NORMALMAPDIFFUSE
-            #pragma shader_feature_local _DISTANCEFADE
-            #pragma shader_feature_local _RIMLIGHTING
-            #pragma shader_feature_local _BACKSCATTER
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _NORMALMAPDIFFUSE
+            #pragma shader_feature_local_fragment _DISTANCEFADE
+            #pragma shader_feature_local_fragment _RIMLIGHTING
+            #pragma shader_feature_local_fragment _BACKSCATTER
 
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -181,6 +185,7 @@ Shader "Lux URP/Human/Skin"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
         //  Include base inputs and all other needed "base" includes
             #include "Includes/Lux URP Skin Inputs.hlsl"
@@ -190,7 +195,6 @@ Shader "Lux URP/Human/Skin"
 
         //--------------------------------------
         //  Vertex shader
-
 
             VertexOutput LitPassVertex(VertexInput input)
             {
@@ -306,7 +310,7 @@ Shader "Lux URP/Human/Skin"
                         diffuseNormalWS = TransformTangentToWorld(diffuseNormalTS, ToW);
                         diffuseNormalWS = NormalizeNormalPerPixel(diffuseNormalWS);
                     #else
-                //  Here we let the user decide to use the per vertex or the specular normal.
+                    //  Here we let the user decide to use the per vertex or the specular normal.
                         diffuseNormalWS = (_VertexNormal) ? NormalizeNormalPerPixel(input.normalWS.xyz) : inputData.normalWS;
                     #endif
                 #else
@@ -327,6 +331,9 @@ Shader "Lux URP/Human/Skin"
                 inputData.fogCoord = input.fogFactorAndVertexLight.x;
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, diffuseNormalWS); //inputData.normalWS);
+
+                //inputData.normalizedScreenSpaceUV = input.positionCS.xy;
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
             }
 
             half4 LitPassFragment(VertexOutput input) : SV_Target
@@ -362,7 +369,7 @@ Shader "Lux URP/Human/Skin"
                 #endif
 
             //  Apply lighting
-                half4 color = LuxURPSkinFragmentPBR(
+                half4 color = LuxLWRPSkinFragmentPBR(
                     inputData, 
                     surfaceData.albedo, 
                     surfaceData.metallic, 
@@ -409,7 +416,8 @@ Shader "Lux URP/Human/Skin"
 
             ZWrite On
             ZTest LEqual
-            Cull Off
+            ColorMask 0
+            Cull Back
 
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard srp library
@@ -470,7 +478,7 @@ Shader "Lux URP/Human/Skin"
 
             ZWrite On
             ColorMask 0
-            Cull Off
+            Cull Back
 
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard srp library
@@ -512,6 +520,40 @@ Shader "Lux URP/Human/Skin"
             ENDHLSL
         }
 
+    //  Depth Normals --------------------------------------------
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull Back
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard SRP library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local _NORMALMAP
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+
+            //#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+            #include "Includes/Lux URP Skin Inputs.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
+            ENDHLSL
+        } 
+
+
     //  Meta -----------------------------------------------------
         
         Pass
@@ -546,6 +588,9 @@ Shader "Lux URP/Human/Skin"
                 outSurfaceData.normalTS = half3(0,0,1);
                 outSurfaceData.occlusion = 1;
                 outSurfaceData.emission = 0;
+
+                outSurfaceData.clearCoatMask = 0;
+                outSurfaceData.clearCoatSmoothness = 0;
             }
 
         //  Finally include the meta pass related stuff  

@@ -18,6 +18,10 @@
         [Enum(Off,0,On,1)]_Coverage ("     Alpha To Coverage", Float) = 0
         [Enum(All,15,Depth,0)]
         _ColorMask ("Color Mask", Float) = 15
+
+        [Space(5)]
+        [Toggle(_SSAO_ENABLED)]
+        _ReceiveSSAO                ("Receive SSAO", Float) = 1.0
         
         [Header(Toon Lighting)]
         [Space(8)]
@@ -48,7 +52,7 @@
         _Anisotropy                 ("          Anisotropy", Range(-1.0, 1.0)) = 0.0
         [Space(5)]
         [Toggle]
-        _EnergyConservation         ("     Energy Conservation", Float) = 1
+        _EnergyConservation         ("     EnergyConservation", Float) = 1
         [HDR] _SpecColor            ("     Specular", Color) = (0.2, 0.2, 0.2)
         [HDR] _SpecColor2nd         ("     Secondary Specular", Color) = (0.4, 0.4, 0.4)
         _Smoothness                 ("     Smoothness", Range(0.0, 1.0)) = 0.5
@@ -190,7 +194,7 @@
 //  So we tag the outline pass as "LightMode" = "UniversalForward" whcih makes unity draw it after our "regular" pass.
             
             Tags{"LightMode" = "UniversalForward"}
-
+            
             //Tags{"LightMode" = "Outline"} // Needed to disable pass but then it does not get rendered...
             Blend SrcAlpha OneMinusSrcAlpha
             Cull [_CullOutline]
@@ -202,8 +206,6 @@
             // Required to compile gles 2.0 with standard SRP library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-
-        //  Shader target needs to be 3.0 due to tex2Dlod in the vertex shader and VFACE
             #pragma target 2.0
 
             #pragma shader_feature_local _ALPHATEST_ON
@@ -383,8 +385,6 @@
             // Required to compile gles 2.0 with standard SRP library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-
-        //  Shader target needs to be 3.0 due to tex2Dlod in the vertex shader and VFACE
             #pragma target 2.0
 
             // -------------------------------------
@@ -392,33 +392,36 @@
             #define _SPECULAR_SETUP 1
 
             #pragma shader_feature_local _ALPHATEST_ON
-
-            #pragma shader_feature_local _COLORIZEMAIN
-            #pragma shader_feature_local _COLORIZEADD
-            #pragma shader_feature_local _TOONRIM
+            #pragma shader_feature_local_fragment _COLORIZEMAIN
+            #pragma shader_feature_local_fragment _COLORIZEADD
+            #pragma shader_feature_local_fragment _TOONRIM
             //#pragma shader_feature_local GRADIENT_ON
             #pragma shader_feature_local _ _RAMP_SMOOTHSAMPLING _RAMP_POINTSAMPLING
             #pragma shader_feature_local _ _TEXMODE_ONE _TEXMODE_TWO
 
+            #pragma shader_feature_local_fragment _SSAO_ENABLED
+
             #pragma shader_feature_local _MASKMAP
 
-            #pragma shader_feature _NORMALMAP
-            #pragma shader_feature_local _RIMLIGHTING
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _RIMLIGHTING
 
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
-#pragma shader_feature_local _ANISOTROPIC       // Also affects vertex shader!
+#pragma shader_feature_local _ANISOTROPIC       // Also affects vertex shader! (vertex input)
 
             // -------------------------------------
             // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -547,7 +550,6 @@
             void InitializeInputData(VertexOutput input, half3 normalTS, half facing, out InputData inputData)
             {
                 inputData = (InputData)0;
-
                 #if defined(REQUIRES_WORLD_SPACE_POS_INTERPOLATOR)
                     inputData.positionWS = input.positionWS;
                 #endif
@@ -575,6 +577,10 @@
                 inputData.fogCoord = input.fogFactorAndVertexLight.x;
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+            
+                //inputData.normalizedScreenSpaceUV = input.positionCS.xy;
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
             }
 
             half4 LitPassFragment(VertexOutput input, half facing : VFACE) : SV_Target
@@ -751,7 +757,7 @@
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature_local _ALPHATEST_ON
+            #pragma shader_feature _ALPHATEST_ON
             #pragma shader_feature_local _ _TEXMODE_ONE _TEXMODE_TWO
 
             //--------------------------------------
@@ -792,6 +798,42 @@
             ENDHLSL
         }
 
+    //  Depth Normals -----------------------------------------------------
+        
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard SRP library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _ALPHATEST_ON
+            #pragma shader_feature_local _ _TEXMODE_ONE _TEXMODE_TWO
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+
+            //#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+            #include "Includes/Lux URP Toon Inputs.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
+            ENDHLSL
+        }
+
     //  Meta -----------------------------------------------------
         
         Pass
@@ -826,6 +868,12 @@
                 outSurfaceData.normalTS = half3(0,0,1);
                 outSurfaceData.occlusion = 1;
                 outSurfaceData.emission = 0;
+
+            //  UPR 10+
+                //#if VERSION_GREATER_EQUAL(10, 0)
+                    outSurfaceData.clearCoatMask = 0;
+                    outSurfaceData.clearCoatSmoothness = 0;
+                //#endif
             }
 
         //  Finally include the meta pass related stuff  

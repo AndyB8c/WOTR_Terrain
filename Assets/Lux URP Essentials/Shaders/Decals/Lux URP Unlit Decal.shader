@@ -5,24 +5,24 @@ Shader "Lux URP/Projection/Decal Unlit"
         [HeaderHelpLuxURP_URL(skzrp97i0tvt)]
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(ORTHO_SUPPORT)]
         _OrthoSpport                                    ("Enable Orthographic Support", Float) = 0
         [Toggle(HQ_SAMPLING)]
         _HQSampling                                     ("Enable HQ Sampling", Float) = 0
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [HDR] _Color                                    ("Color", Color) = (1,1,1,1)
         [NoScaleOffset] _BaseMap                        ("Albedo (RGB) Alpha (A)", 2D) = "white" {}
 
         [Header(Distance Fading)]
-        [Space(5)]
+        [Space(8)]
         [LuxLWRPDistanceFadeDrawer]
         _DistanceFade                                   ("Distance Fade Params", Vector) = (2500, 0.001, 0, 0)
 
         [Header(Stencil)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _StencilRef                          ("Stencil Reference", Range (0, 255)) = 0
         [IntRange] _ReadMask                            ("     Read Mask", Range (0, 255)) = 255
         [IntRange] _WriteMask                           ("     Write Mask", Range (0, 255)) = 255
@@ -30,7 +30,7 @@ Shader "Lux URP/Projection/Decal Unlit"
         _StencilCompare                                 ("Stencil Comparison", Int) = 6
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_APPLYFOG)] _ApplyFog("Enable Fog", Float) = 0.0
     }
 
@@ -44,8 +44,8 @@ Shader "Lux URP/Projection/Decal Unlit"
         }
         Pass
         {
-            Name "StandardUnlit"
-            Tags{"LightMode" = "UniversalForward"}
+            Name "Unlit"
+            //Tags{"LightMode" = "UniversalForward"}
 
             Stencil {
                 Ref  [_StencilRef]
@@ -56,7 +56,6 @@ Shader "Lux URP/Projection/Decal Unlit"
 
 
             Blend SrcAlpha OneMinusSrcAlpha
-
         //  We draw backfaces to prevent clipping
             Cull Front
         //  So we have to set ZTest to always
@@ -71,12 +70,14 @@ Shader "Lux URP/Projection/Decal Unlit"
             #pragma target 2.0
 
             #pragma shader_feature_local ORTHO_SUPPORT
-            #pragma shader_feature_local HQ_SAMPLING
-
             #pragma shader_feature_local _APPLYFOG
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Material Keywords
+            #pragma shader_feature_local_fragment HQ_SAMPLING
+
+            // -------------------------------------
+            // Universal Pipeline keywords
 
             // -------------------------------------
             // Unity defined keywords
@@ -85,6 +86,7 @@ Shader "Lux URP/Projection/Decal Unlit"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
             
             #pragma vertex vert
             #pragma fragment frag
@@ -98,8 +100,8 @@ Shader "Lux URP/Projection/Decal Unlit"
             CBUFFER_START(UnityPerMaterial)
                 half4 _Color;
                 float2 _DistanceFade;
+                float4 _BaseMap_TexelSize; // what the fuck?! SRP batcher
             CBUFFER_END
-
             #if defined(SHADER_API_GLES)
                 TEXTURE2D(_CameraDepthTexture); SAMPLER(sampler_CameraDepthTexture);
             #else
@@ -107,7 +109,7 @@ Shader "Lux URP/Projection/Decal Unlit"
             #endif
             float4 _CameraDepthTexture_TexelSize;
             //TEXTURE2D(_BaseMap); SAMPLER(sampler_BaseMap);
-             float4 _BaseMap_TexelSize;
+            //float4 _BaseMap_TexelSize;
 
             struct VertexInput
             {
@@ -232,21 +234,21 @@ Shader "Lux URP/Projection/Decal Unlit"
                         #endif
                         
                     //  Get ortho Depth
-                    //  Old code, no idea why this ever worked...
-                        // depthOrtho = lerp(_ProjectionParams.y, _ProjectionParams.z, depthOrtho);
-                        // float2 rayOrtho = -float2( unity_OrthoParams.xy * ( input.screenUV.xy - 0.5) * 2 /* to clip space */);
-                        // float4 vposOrtho = float4(rayOrtho, -depthOrtho, 1);
-                        // float3 wposOrtho = mul(unity_CameraToWorld, vposOrtho).xyz;
-                        // wposOrtho -= _WorldSpaceCameraPos * 2; // TODO: Why * 2 ????
-                        // wposOrtho *= -1;
-                        // float3 positionOrthoOS = mul( GetWorldToObjectMatrix(), float4(wposOrtho, 1)).xyz;
-                        
+                    //  Old code, works with HDRP10.1 again... crazy
                         depthOrtho = lerp(_ProjectionParams.y, _ProjectionParams.z, depthOrtho);
-                        float2 rayOrtho = float2( unity_OrthoParams.xy * ( input.screenUV.xy - 0.5) * 2 /* to clip space */);
+                        float2 rayOrtho = -float2( unity_OrthoParams.xy * ( input.screenUV.xy - 0.5) * 2 /* to clip space */);
                         float4 vposOrtho = float4(rayOrtho, -depthOrtho, 1);
                         float3 wposOrtho = mul(unity_CameraToWorld, vposOrtho).xyz;
-
+                        wposOrtho -= _WorldSpaceCameraPos * 2; // TODO: Why * 2 ????
+                        wposOrtho *= -1;
                         float3 positionOrthoOS = mul( GetWorldToObjectMatrix(), float4(wposOrtho, 1)).xyz;
+                        
+                        // depthOrtho = lerp(_ProjectionParams.y, _ProjectionParams.z, depthOrtho);
+                        // float2 rayOrtho = float2( unity_OrthoParams.xy * ( input.screenUV.xy - 0.5) * 2 /* to clip space */);
+                        // float4 vposOrtho = float4(rayOrtho, -depthOrtho, 1);
+                        // float3 wposOrtho = mul(unity_CameraToWorld, vposOrtho).xyz;
+                        // float3 positionOrthoOS = mul( GetWorldToObjectMatrix(), float4(wposOrtho, 1)).xyz;
+
                         positionOS = positionOrthoOS;
                     }
                     else {
@@ -266,7 +268,7 @@ Shader "Lux URP/Projection/Decal Unlit"
                 clip(float3(0.5, 0.5, 0.5) - abs(positionOS.xyz));
 
                 float2 texUV = positionOS.xz + float2(0.5, 0.5);
-            
+                
             //  HQ Decal Sampling
                 #if defined(HQ_SAMPLING) && !defined(ORTHO_SUPPORT)
                     float2 UvPixelDiffX = ComputeDecalDDX(input, uv, texUV) * _BaseMap_TexelSize.zw;

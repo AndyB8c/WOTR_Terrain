@@ -22,7 +22,26 @@ half4 LuxURPTreeBarkFragment (InputData inputData, half3 albedo, half3 specular,
     half smoothness, half occlusion, half alpha, half squashAmount
 )
 {
-    Light mainLight = GetMainLight(inputData.shadowCoord);
+
+//  ShadowMask: To ensure backward compatibility we have to avoid using shadowMask input, as it is not present in older shaders
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = inputData.shadowMask;
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    //Light mainLight = GetMainLight(inputData.shadowCoord);
+    Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS, shadowMask);
+
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(inputData.normalizedScreenSpaceUV);
+        mainLight.color *= aoFactor.directAmbientOcclusion;
+        occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+    #endif
+
     //MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI, half4(0, 0, 0, 0));
 
     half3 color = albedo * inputData.bakedGI * occlusion;
@@ -32,7 +51,12 @@ half4 LuxURPTreeBarkFragment (InputData inputData, half3 albedo, half3 specular,
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i)
         {
-            Light light = GetAdditionalLight(i, inputData.positionWS);
+            // Light light = GetAdditionalLight(i, inputData.positionWS);
+        //  URP 10: We have to use the new GetAdditionalLight function
+            Light light = GetAdditionalLight(i, inputData.positionWS, shadowMask);
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                light.color *= aoFactor.directAmbientOcclusion;
+            #endif
             color += LightingTreeBark(light, albedo, specular, smoothness, squashAmount, inputData.normalWS, inputData.viewDirectionWS);
         }
     #endif
@@ -79,8 +103,27 @@ half4 LuxURPTreeLeafFragmentPBR(InputData inputData, half3 albedo, half3 specula
     half smoothness, half occlusion, half alpha, half2 translucency, half3 translucencyColor, half squashAmount, half shadowStrength
 )
 {
-    Light mainLight = GetMainLight(inputData.shadowCoord);
+    
+
+//  ShadowMask: To ensure backward compatibility we have to avoid using shadowMask input, as it is not present in older shaders
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = inputData.shadowMask;
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    //Light mainLight = GetMainLight(inputData.shadowCoord);
     //MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI, half4(0, 0, 0, 0));
+    Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS, shadowMask);
+
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(inputData.normalizedScreenSpaceUV);
+        mainLight.color *= aoFactor.directAmbientOcclusion;
+        occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+    #endif
 
     mainLight.shadowAttenuation = lerp(1.0h, mainLight.shadowAttenuation, shadowStrength * squashAmount /* fade out */);
 

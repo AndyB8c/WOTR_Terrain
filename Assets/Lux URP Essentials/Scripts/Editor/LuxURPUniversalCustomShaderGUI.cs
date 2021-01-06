@@ -50,13 +50,13 @@ public class LuxURPUniversalCustomShaderGUI : ShaderGUI
 
     //  Emission
         if ( material.HasProperty("_Emission")) {
-    		if ( material.GetFloat("_Emission") == 1.0f) {
-    			material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
-    		}
-    		else {
-    			material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
-    			material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.EmissiveIsBlack;
-    		}
+            if ( material.GetFloat("_Emission") == 1.0f) {
+                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+            }
+            else {
+                material.globalIlluminationFlags = MaterialGlobalIlluminationFlags.BakedEmissive;
+                material.globalIlluminationFlags |= MaterialGlobalIlluminationFlags.EmissiveIsBlack;
+            }
         }
 
     //  Get RenderQueue Offset - if any
@@ -215,7 +215,7 @@ public class LuxURPUniversalCustomShaderGUI : ShaderGUI
             }
         }
 
-	//  Needed to make the Selection Outline work
+    //  Needed to make the Selection Outline work
         if (material.HasProperty("_MainTex") && material.HasProperty("_BaseMap") ) {
 
         //  Alpha might be stored in the Mask Map

@@ -90,7 +90,25 @@ half4 LuxURPTranslucentFragmentPBR(InputData inputData, half3 albedo, half metal
     BRDFData brdfData;
     InitializeBRDFData(albedo, metallic, specular, smoothness, alpha, brdfData);
 
-    Light mainLight = GetMainLight(inputData.shadowCoord);
+//  ShadowMask: To ensure backward compatibility we have to avoid using shadowMask input, as it is not present in older shaders
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = inputData.shadowMask;
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    //Light mainLight = GetMainLight(inputData.shadowCoord);
+    Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS, shadowMask);
+    half3 mainLightColor = mainLight.color;
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(inputData.normalizedScreenSpaceUV);
+        mainLight.color *= aoFactor.directAmbientOcclusion;
+        occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+    #endif
+
     MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI, half4(0, 0, 0, 0));
 
     half3 color = GlobalIllumination_Lux(brdfData, inputData.bakedGI, occlusion, inputData.normalWS, inputData.viewDirectionWS,     AmbientReflection);
@@ -113,7 +131,7 @@ half4 LuxURPTranslucentFragmentPBR(InputData inputData, half3 albedo, half metal
     half3 transLightDir = mainLight.direction + inputData.normalWS * translucency.w;
     half transDot = dot( transLightDir, -inputData.viewDirectionWS );
     transDot = exp2(saturate(transDot) * transPower - transPower);
-    color += brdfData.diffuse * transDot * (1.0 - NdotL) * mainLight.color * lerp(1.0h, mainLight.shadowAttenuation, translucency.z) * translucency.x * 4
+    color += brdfData.diffuse * transDot * (1.0h - NdotL) * mainLightColor * lerp(1.0h, mainLight.shadowAttenuation, translucency.z) * translucency.x * 4
     #if defined(_STANDARDLIGHTING)
         * mask
     #endif
@@ -124,23 +142,34 @@ half4 LuxURPTranslucentFragmentPBR(InputData inputData, half3 albedo, half metal
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i)
         {
-            //Light light = GetAdditionalLight(i, inputData.positionWS);
-            //  Get index upfront as we need it for GetAdditionalLightShadowParams();
+        //  Light light = GetAdditionalLight(i, inputData.positionWS);
+        //  Get index upfront as we need it for GetAdditionalLightShadowParams();
             int index = GetPerObjectLightIndex(i);
+        //  URP 10: We have to use the new GetAdditionalLight function or reconstruct it:
             Light light = GetAdditionalPerObjectLight(index, inputData.positionWS);
+            half3 lightColor = light.color;
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                light.color *= aoFactor.directAmbientOcclusion;
+            #endif
+            #if USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
+                half4 occlusionProbeChannels = _AdditionalLightsBuffer[index].occlusionProbeChannels;
+            #else
+                half4 occlusionProbeChannels = _AdditionalLightsOcclusionProbes[index];
+            #endif
+            light.shadowAttenuation = AdditionalLightShadow(index, inputData.positionWS, shadowMask, occlusionProbeChannels);
 
     //  Wrapped Diffuse
             NdotL = saturate((dot(inputData.normalWS, light.direction) + w) / ((1 + w) * (1 + w)));
             color += LightingPhysicallyBasedWrapped(brdfData, light, inputData.normalWS, inputData.viewDirectionWS, NdotL);
 
-half4 shadowParams = GetAdditionalLightShadowParams(index);
-light.color *= lerp(1, shadowParams.x, maskbyshadowstrength); // shadowParams.x == shadow strength, which is 0 for point lights
+    //  Transmission
+            half4 shadowParams = GetAdditionalLightShadowParams(index);
+            light.color *= lerp(1, shadowParams.x, maskbyshadowstrength); // shadowParams.x == shadow strength, which is 0 for point lights
 
-    //  Translucency
             transLightDir = light.direction + inputData.normalWS * translucency.w;
             transDot = dot( transLightDir, -inputData.viewDirectionWS );
             transDot = exp2(saturate(transDot) * transPower - transPower);
-            color += brdfData.diffuse * transDot * (1.0 - NdotL) * light.color * lerp(1.0h, light.shadowAttenuation, translucency.z) * light.distanceAttenuation * translucency.x * 4
+            color += brdfData.diffuse * transDot * (1.0h - NdotL) * lightColor * lerp(1.0h, light.shadowAttenuation, translucency.z) * light.distanceAttenuation * translucency.x * 4
             #if defined(_STANDARDLIGHTING)
                 * mask
             #endif
@@ -151,13 +180,7 @@ light.color *= lerp(1, shadowParams.x, maskbyshadowstrength); // shadowParams.x 
     #ifdef _ADDITIONAL_LIGHTS_VERTEX
         color += inputData.vertexLighting * brdfData.diffuse;
     #endif
-
     color += emission;
-
     return half4(color, alpha);
 }
-
-
-
-
 #endif

@@ -143,6 +143,8 @@ void Lighting_half(
 	SamplerState sampler_Linear,
 	SamplerState sampler_Point,
 
+    bool receiveSSAO,
+
 //  Final lit color
     out half3 Lighting,
     out half3 MetaAlbedo,
@@ -160,14 +162,54 @@ void Lighting_half(
     half3 tnormal = normalWS;
 
 //  Normal mapping
-    #if defined(NORMAL_ON)
+    #if defined(NORMAL_ON) //if (enableNormalMapping) {
         tnormal = TransformTangentToWorld(normalTS, half3x3(tangentWS.xyz, bitangentWS.xyz, normalWS.xyz));
-    #endif
+    #endif //}
     normalWS = NormalizeNormalPerPixel(tnormal);
     viewDirectionWS = SafeNormalize(viewDirectionWS);
 
 //  Remap values - old version
     //half diffuseUpper = saturate(diffuseStep + diffuseFalloff);
+
+    float4 clipPos = TransformWorldToHClip(positionWS);
+//  Get Shadow Sampling Coords / Unfortunately per pixel...
+    #if SHADOWS_SCREEN
+        float4 shadowCoord = ComputeScreenPos(clipPos);
+    #else
+        float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
+    #endif
+
+//  Shadow mask 
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = SAMPLE_SHADOWMASK(lightMapUV);
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    //Light mainLight = GetMainLight(shadowCoord);
+    Light mainLight = GetMainLight(shadowCoord, positionWS, shadowMask);
+
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        AmbientOcclusionFactor aoFactor;
+        aoFactor.indirectAmbientOcclusion = 1;
+        aoFactor.directAmbientOcclusion = 1;
+        if(receiveSSAO) {
+            float4 ndc = clipPos * 0.5f;
+            float2 normalized = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;
+            normalized /= clipPos.w;
+            normalized *= _ScreenParams.xy;
+        //  We could also use IN.Screenpos(default) --> ( IN.Screenpos.xy * _ScreenParams.xy)
+        //  HDRP 10.1
+            normalized = GetNormalizedScreenSpaceUV(normalized);
+            aoFactor = GetScreenSpaceAmbientOcclusion(normalized);
+            mainLight.color *= aoFactor.directAmbientOcclusion;
+            occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+            //occlusion = smoothstep(diffuseStep, diffuseUpper, occlusion);
+        }
+    #endif
 
 //  GI Lighting
     half3 bakedGI = 0;
@@ -180,15 +222,6 @@ void Lighting_half(
         }
     #endif
 
-//  Get Shadow Sampling Coords / Unfortunately per pixel...
-    #if SHADOWS_SCREEN
-        float4 clipPos = TransformWorldToHClip(positionWS);
-        float4 shadowCoord = ComputeScreenPos(clipPos);
-    #else
-        float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
-    #endif
-
-    Light mainLight = GetMainLight(shadowCoord);
     //mainLight.shadowAttenuation = smoothstep(0.0h, shadowFalloff, mainLight.shadowAttenuation);
     mainLight.shadowAttenuation = smoothstep( (1 - shadowFalloff) * shadowFalloff, shadowFalloff, mainLight.shadowAttenuation);
     MixRealtimeAndBakedGI(mainLight, normalWS, bakedGI, half4(0, 0, 0, 0));
@@ -257,7 +290,7 @@ void Lighting_half(
     half3 spec;
     half specularUpper;
     
-    #if defined(SPECULAR_ON) //if (enableSpecular) {
+    #if defined(SPECULAR_ON)
         specularSmoothness = exp2(10 * smoothness + 1);
         specularUpper = saturate(specularStep + specularFalloff * (1.0h + smoothness));
         #if defined(ANISO_ON)
@@ -266,22 +299,27 @@ void Lighting_half(
             spec = LightingSpecular_Toon(mainLight, NdotL, normalWS, viewDirectionWS, specular, specularSmoothness, smoothness, specularStep, specularUpper, energyConservation);
         #endif
         specularLighting = spec * atten;
-    #endif //}
+    #endif
     
 //  Rim Lighting
-    #if defined(RIM_ON) //if (enableRimLighting) {
+    #if defined(RIM_ON)
         half rim = saturate(1.0h - saturate( dot(normalWS, viewDirectionWS)) );
         //rimLighting = smoothstep(rimPower, rimPower + rimFalloff, rim) * rimColor.rgb;
     //  Stabilize rim
         float delta = fwidth(rim);
         rimLighting = smoothstep(rimPower - delta, rimPower + rimFalloff  + delta, rim) * rimColor.rgb;
-    #endif //}
+    #endif
     
 //  Handle additional lights
     #ifdef _ADDITIONAL_LIGHTS
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i) {
             Light light = GetAdditionalLight(i, positionWS);
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                if(receiveSSAO) {
+                    light.color *= aoFactor.directAmbientOcclusion;
+                }
+            #endif
             light.shadowAttenuation = smoothstep(0.0h, shadowFalloff, light.shadowAttenuation);
 
             NdotL = dot(normalWS, light.direction);
@@ -334,11 +372,11 @@ void Lighting_half(
         + ( litAlbedo
     //  spec and rim lighting    
         #if defined(SPECULAR_ON)
-            + specularLighting * lightIntensity
+        	+ specularLighting * lightIntensity
         #endif
         #if defined(RIM_ON)
-            + rimLighting * lerp(1.0h, lightIntensity, rimAttenuation) 
-        #endif
+        	+ rimLighting * lerp(1.0h, lightIntensity, rimAttenuation) 
+       	#endif
         ) * lightColor
     ;
 
@@ -374,7 +412,6 @@ void Lighting_float(
 //  Surface description
     half3 albedo,
     half3 shadedAlbedo,
-
     half anisotropy,
     bool energyConservation,
     half3 specular,
@@ -413,6 +450,8 @@ void Lighting_float(
 	SamplerState sampler_Linear,
 	SamplerState sampler_Point,
 
+    bool receiveSSAO,
+
 //  Final lit color
     out half3 Lighting,
     out half3 MetaAlbedo,
@@ -427,6 +466,7 @@ void Lighting_float(
         rimPower, rimFalloff, rimColor, rimAttenuation,
         lightMapUV,
         GradientMap, GradientWidth, sampler_Linear, sampler_Point,
+        receiveSSAO,
         Lighting, MetaAlbedo, MetaSpecular
     );
 }

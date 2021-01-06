@@ -159,7 +159,7 @@ half3 LightingHair_Lux(
     half NdotL = dot(normalWS, light.direction);
     half LdotV = dot(light.direction, viewDirectionWS);
     float invLenLV = rsqrt(max(2.0 * LdotV + 2.0, FLT_EPS));
-    float3 halfDir = (light.direction + viewDirectionWS) * invLenLV;
+    half3 halfDir = (light.direction + viewDirectionWS) * invLenLV;
 
     half3 hairSpec1 = specularTint * D_KajiyaKay_Lux(t1, halfDir, roughness1);
     #if defined(_SECONDARYLOBE)
@@ -214,6 +214,15 @@ half4 LuxURPHairFragment(
 )
 {
 
+//  ShadowMask: To ensure backward compatibility we have to avoid using shadowMask input, as it is not present in older shaders
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = inputData.shadowMask;
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
 //  TODO: Simplify this...
     perceptualRoughness = PerceptualSmoothnessToPerceptualRoughness(perceptualRoughness); // * saturate(noise.r * 2) );
     half roughness1 = PerceptualRoughnessToRoughness(perceptualRoughness);
@@ -231,7 +240,6 @@ half4 LuxURPHairFragment(
 
     half geomNdotV = dot(inputData.normalWS, inputData.viewDirectionWS); 
 
-    
 //  Adjust tangentWS in case normal mapping is enabled
     #if defined(_NORMALMAP)   
         tangentWS = Orthonormalize(tangentWS, inputData.normalWS);
@@ -255,19 +263,33 @@ half4 LuxURPHairFragment(
 //  (From HDRP) Note: For Kajiya hair we currently rely on a single cubemap sample instead of two, as in practice smoothness of both lobe aren't too far from each other.
 //  and we take smoothness of the secondary lobe as it is often more rough (it is the colored one).
 //  NOPE: We use primary!!!!! 
-    half3 color = GlobalIlluminationHair_Lux(albedo, specular, roughness1, perceptualRoughness, occlusion, inputData.bakedGI, inputData.normalWS, inputData.viewDirectionWS, bitangentWS, ambientReflection);
 
 //  Main Light
     Light light = GetMainLight(inputData.shadowCoord);
-    MixRealtimeAndBakedGI(light, inputData.normalWS, inputData.bakedGI, half4(0, 0, 0, 0));
+    
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(inputData.normalizedScreenSpaceUV);
+    //  Does not play nicely with blend?!
+        //light.color *= aoFactor.directAmbientOcclusion;
+        occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+    #endif
 
+    half3 color = GlobalIlluminationHair_Lux(albedo, specular, roughness1, perceptualRoughness, occlusion, inputData.bakedGI, inputData.normalWS, inputData.viewDirectionWS, bitangentWS, ambientReflection);
+    MixRealtimeAndBakedGI(light, inputData.normalWS, inputData.bakedGI, half4(0, 0, 0, 0));
     color += LightingHair_Lux(albedo, specular, light, inputData.normalWS, geomNdotV, inputData.viewDirectionWS, pbRoughness1, pbRoughness2, t1, t2, specularTint, secondarySpecularTint, rimTransmissionIntensity);
 
 //  Additional Lights
     #ifdef _ADDITIONAL_LIGHTS
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i) {
-            light = GetAdditionalLight(i, inputData.positionWS);
+            // Light light = GetAdditionalPerObjectLight(index, positionWS); // here; shadowAttenuation = 1.0;
+        //  URP 10: We have to use the new GetAdditionalLight function
+            Light light = GetAdditionalLight(i, inputData.positionWS, shadowMask);
+        //  Does not play nicely with blend?!
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                //light.color *= aoFactor.directAmbientOcclusion;
+            #endif
             color += LightingHair_Lux(albedo, specular, light, inputData.normalWS, geomNdotV, inputData.viewDirectionWS, pbRoughness1, pbRoughness2, t1, t2, specularTint, secondarySpecularTint, rimTransmissionIntensity);
         }
     #endif

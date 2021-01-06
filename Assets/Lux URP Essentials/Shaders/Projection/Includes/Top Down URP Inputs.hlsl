@@ -1,17 +1,27 @@
-#ifndef INPUT_BASE_INCLUDED
-#define INPUT_BASE_INCLUDED
+#ifndef INPUT_BASETOPDOWN_INCLUDED
+#define INPUT_BASETOPDOWN_INCLUDED
+
+    #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+//  defines a bunch of helper functions (like lerpwhiteto)
+    #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"  
+//  defines SurfaceData, textures and the functions Alpha, SampleAlbedoAlpha, SampleNormal, SampleEmission
+    #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
+//  defines e.g. "DECLARE_LIGHTMAP_OR_SH"
+    #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+ 
+    #include "../Includes/Lux URP Simple Fuzz Lighting.hlsl"
+
+    #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
+    #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
 
 
     CBUFFER_START(UnityPerMaterial)
-        
-//        #if !defined(UNITY_PASS_SHADOWCASTER)
-//#if !defined(CUSTOMMETAPASS)
         float4 _BaseMap_ST;
+
+        half4 _BaseColor;
 
         half3 _SpecColor;
         half _BumpScale;
-//#endif
-//        #endif
 
         half _GlossMapScale;
         half _GlossMapScaleDyn;
@@ -19,7 +29,6 @@
         half3 _EmissionColor;
         half _Occlusion;
 
-        
         half _BumpScaleDyn;
 
         half _NormalFactor;
@@ -37,6 +46,8 @@
         half    _FuzzWrap;
         half    _FuzzPower;        
         half    _FuzzBias;
+
+        half    _Cutoff;    //HDRP 10.1. DepthNormal pass
 
     CBUFFER_END
 
@@ -59,7 +70,7 @@
         //#ifdef _ADDITIONAL_LIGHTS
         float3 positionWS               : TEXCOORD0;
         //#endif
-        #if !defined(UNITY_PASS_SHADOWCASTER) && !defined(DEPTHONLYPASS)
+        #if !defined(UNITY_PASS_SHADOWCASTER) && !defined(DEPTHONLYPASS) && !defined(DEPTHNORMALONLYPASS)
             float4 uv                   : TEXCOORD1;
             #if !defined(CUSTOMMETAPASS)
                 DECLARE_LIGHTMAP_OR_SH(lightmapUV, vertexSH, 2);

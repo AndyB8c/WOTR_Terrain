@@ -5,7 +5,7 @@
         [HeaderHelpLuxURP_URL(miywznst4xsx)]
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CompareFunction)]
         _ZTest                      ("ZTest", Int) = 4
         [Enum(Tested,0,Blended,1)]
@@ -20,7 +20,7 @@
 
 
         [Header(Billboard Options)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_UPRIGHT)]
         _Upright                    ("Enable upright oriented Billboard", Float) = 0.0
         [Toggle(_PIVOTTOBOTTOM)]
@@ -37,7 +37,7 @@
 
 
         [Header(Lighting)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_NORMALMAP)]
         _ApplyNormal                ("Enable Lighting", Float) = 0.0
         [Space(5)]
@@ -50,16 +50,16 @@
 
 
         [Header(Fog)]
-        [Space(5)]
+        [Space(8)]
         //[Toggle(_APPLYFOG)] _ApplyFog("Enable Fog", Float) = 1.0
         [Toggle] _ApplyFog          ("Enable Fog", Float) = 1.0
 
         [Header(Render Queue)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _QueueOffset     ("Queue Offset", Range(-50, 50)) = 0
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff]
         _SpecularHighlights         ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
@@ -69,6 +69,10 @@
         [HideInInspector] _SrcBlend ("__src", Float) = 1.0
         [HideInInspector] _DstBlend ("__dst", Float) = 0.0
 
+    //  Lightmapper and outline selection shader need _MainTex, _Color and _Cutoff
+        [HideInInspector] _MainTex  ("Albedo", 2D) = "white" {}
+        [HideInInspector] _Color    ("Color", Color) = (1,1,1,1)
+
     }
     SubShader
     {
@@ -77,12 +81,12 @@
             "RenderPipeline" = "UniversalPipeline"
             "RenderType" = "Opaque"
             "Queue" = "Transparent"
-        
             "DisableBatching" = "True" // Has nor effet on static batching?!
             "PreviewType" = "Plane"
         }
         Pass
         {
+            Name "ForwardLit"
             Tags{"LightMode" = "UniversalForward"}
 
             Blend[_SrcBlend][_DstBlend]
@@ -106,16 +110,17 @@
             #pragma shader_feature_local _PIVOTTOBOTTOM
             #pragma shader_feature_local _APPLYFOG _APPLYFOGADDITIVELY
 
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
+            #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
 
             // -------------------------------------
             // Unity defined keywords
@@ -124,6 +129,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
             
             #pragma vertex vert
             #pragma fragment frag
@@ -174,7 +180,6 @@
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_TRANSFER_INSTANCE_ID(input, output);
                 UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
-
 
             //  Instance world position
                 float3 positionWS = float3(UNITY_MATRIX_M[0].w, UNITY_MATRIX_M[1].w, UNITY_MATRIX_M[2].w);
@@ -240,10 +245,8 @@
 
                 #endif
 
-                
                 //half3 vertexLight = VertexLighting(vertexInput.positionWS, normalInput.normalWS);
                 //half fogFactor = ComputeFogFactor(vertexInput.positionCS.z);
-
                 //output.uv = TRANSFORM_TEX(input.texcoord, _BaseMap);
 
                 #if defined(_APPLYFOG) || defined(_APPLYFOGADDITIVELY)
@@ -319,13 +322,14 @@
 
             ZWrite On
             ZTest LEqual
+            ColorMask 0
             Cull Off
 
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard srp library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-            #pragma target 2.0
+            #pragma target 2.0 
 
 
             // -------------------------------------
@@ -338,6 +342,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
@@ -348,7 +353,6 @@
             
         //  Shadow caster specific input
             float3 _LightDirection;
-
 
             struct VertexInput
             {
@@ -441,14 +445,14 @@
             // Required to compile gles 2.0 with standard srp library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-            #pragma target 2.0
+            #pragma target 2.0 
 
             #pragma vertex DepthOnlyVertex
             #pragma fragment DepthOnlyFragment
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
+            #define _ALPHATEST_ON 1
 
             #pragma shader_feature_local _UPRIGHT
             #pragma shader_feature_local _PIVOTTOBOTTOM
@@ -456,6 +460,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #include "Includes/Lux URP Billboard Inputs.hlsl"
 

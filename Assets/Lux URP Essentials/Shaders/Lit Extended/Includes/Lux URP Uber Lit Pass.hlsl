@@ -63,7 +63,7 @@ void InitializeInputData(Varyings input, float3 bitangentWS, half3 viewDirWS, ha
         inputData.positionWS = input.positionWS;
     #endif
 
-    #ifdef _NORMALMAP
+    #if defined(_NORMALMAP) || defined(_SAMPLENORMAL)
         inputData.normalWS = TransformTangentToWorld(normalTS, half3x3(input.tangentWS.xyz, bitangentWS.xyz, input.normalWS.xyz));
     #else
         inputData.normalWS = input.normalWS.xyz;
@@ -83,6 +83,10 @@ void InitializeInputData(Varyings input, float3 bitangentWS, half3 viewDirWS, ha
     inputData.fogCoord = input.fogFactorAndVertexLight.x;
     inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
     inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+
+    //inputData.normalizedScreenSpaceUV = input.positionCS.xy;
+    inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+    inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
 }
 
 ///////////////////////////////////////////////////////////////////////////////

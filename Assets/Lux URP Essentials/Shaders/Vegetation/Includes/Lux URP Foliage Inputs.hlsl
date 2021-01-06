@@ -67,12 +67,16 @@
         float4 positionCS                   : SV_POSITION;
         float2 uv                           : TEXCOORD0;
         half fade                           : TEXCOORD9;
+
+        #if !defined(UNITY_PASS_SHADOWCASTER) && !defined(DEPTHONLYPASS)
+            float3 normalWS                 : TEXCOORD3;
+        #endif
+
         #if !defined(UNITY_PASS_SHADOWCASTER) && !defined(DEPTHONLYPASS)
             DECLARE_LIGHTMAP_OR_SH(lightmapUV, vertexSH, 1);
             #if defined(REQUIRES_WORLD_SPACE_POS_INTERPOLATOR)
                 float3 positionWS           : TEXCOORD2;
             #endif
-            float3 normalWS                 : TEXCOORD3;
             float3 viewDirWS                : TEXCOORD4;
             #ifdef _NORMALMAP
                 float4 tangentWS            : TEXCOORD5;

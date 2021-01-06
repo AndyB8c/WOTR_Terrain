@@ -5,7 +5,7 @@
         [HeaderHelpLuxURP_URL(3omvzsrriztm)]
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CullMode)]
         _Cull                       ("Culling", Float) = 2
         [Toggle(_ALPHATEST_ON)]
@@ -14,9 +14,12 @@
         [ToggleOff(_RECEIVE_SHADOWS_OFF)]
         _ReceiveShadows             ("Receive Shadows", Float) = 1.0
 
+        [Toggle(_SSAO_ENABLED)]
+        _ReceiveSSAO               ("Receive SSAO", Float) = 1.0
+
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [MainColor]
         _BaseColor                  ("Color", Color) = (1,1,1,1)
 
@@ -43,7 +46,7 @@
         _BumpScale                  ("     Normal Scale", Float) = 1.0
 
         [Header(Rim Lighting)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_RIMLIGHTING)]
         _Rim                        ("Enable Rim Lighting", Float) = 0
         [HDR] _RimColor             ("Rim Color", Color) = (0.5,0.5,0.5,1)
@@ -54,7 +57,7 @@
 
 
         [Header(Stencil)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _Stencil         ("Stencil Reference", Range (0, 255)) = 0
         [IntRange] _ReadMask        ("     Read Mask", Range (0, 255)) = 255
         [IntRange] _WriteMask       ("     Write Mask", Range (0, 255)) = 255
@@ -69,7 +72,7 @@
 
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff]
         _SpecularHighlights         ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
@@ -80,7 +83,7 @@
 
 
         [Header(Render Queue)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _QueueOffset     ("Queue Offset", Range(-50, 50)) = 0
 
 
@@ -122,21 +125,21 @@
             Cull [_Cull]
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard SRP library
+        //  Required to compile gles 2.0 with standard SRP library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-
-        //  Shader target needs to be 3.0 due to tex2Dlod in the vertex shader and VFACE
             #pragma target 2.0
 
             // -------------------------------------
             // Material Keywords
             #define _SPECULAR_SETUP 1
 
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _NORMALMAP
-            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-            #pragma shader_feature_local _RIMLIGHTING
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma shader_feature_local_fragment _RIMLIGHTING
+
+            #pragma shader_feature_local_fragment _SSAO_ENABLED
 
             #pragma shader_feature_local _ENABLEBASEMAP
             #if !defined(_ENABLEBASEMAP)
@@ -162,18 +165,20 @@
                 #undef EVALUATE_SH_MIXED
             #endif
 
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -184,6 +189,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
         //  Include base inputs and all other needed "base" includes
             #include "Includes/Lux URP Flat Shaded Inputs.hlsl"
@@ -304,6 +310,9 @@
                 inputData.fogCoord = input.fogFactorAndVertexLight.x;
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH * occlusion, inputData.normalWS);
+
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
             }
 
             half4 LitPassFragment(VertexOutput input, half facing : VFACE) : SV_Target
@@ -338,7 +347,9 @@
                 #endif
 
             //  Apply lighting
-                half4 color = LightweightFragmentPBR(inputData, surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.occlusion, surfaceData.emission, surfaceData.alpha);
+                //half4 color = LightweightFragmentPBR(inputData, surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.occlusion, surfaceData.emission, surfaceData.alpha);
+                half4 color = LuxURPFlatFragmentPBR(inputData, surfaceData.albedo, surfaceData.metallic, surfaceData.specular, surfaceData.smoothness, surfaceData.occlusion, surfaceData.emission, surfaceData.alpha);
+
     
             //  Add fog
                 color.rgb = MixFog(color.rgb, inputData.fogCoord);
@@ -358,7 +369,8 @@
 
             ZWrite On
             ZTest LEqual
-            Cull Off
+            ColorMask 0
+            Cull[_Cull]
 
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard srp library
@@ -368,9 +380,8 @@
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
-
-            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
             #pragma shader_feature_local _ENABLEBASEMAP
             #if !defined(_ENABLEBASEMAP)
@@ -391,6 +402,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
@@ -447,7 +459,7 @@
 
             ZWrite On
             ColorMask 0
-            Cull Off
+            Cull[_Cull]
 
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard srp library
@@ -460,9 +472,8 @@
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
-
-            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
             #pragma shader_feature_local _ENABLEBASEMAP
             #if !defined(_ENABLEBASEMAP)
@@ -483,6 +494,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
             
             #define DEPTHONLYPASS
             #include "Includes/Lux URP Flat Shaded Inputs.hlsl"
@@ -513,6 +525,90 @@
                 #endif
 
                 return 0;
+            }
+
+            ENDHLSL
+        }
+
+    //  Depth Normal -----------------------------------------------------
+
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+
+            #pragma shader_feature_local _ENABLEBASEMAP
+            #if !defined(_ENABLEBASEMAP)
+                #if defined(_ALPHATEST_ON)
+                    #undef _ALPHATEST_ON
+                #endif
+                #if defined(_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A)
+                    #undef _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+                #endif
+            #endif
+
+            #if defined(_SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A)
+                #if defined(_ALPHATEST_ON)
+                    #undef _ALPHATEST_ON
+                #endif
+            #endif
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+            
+            #define DEPTHNORMALONLYPASS
+            #include "Includes/Lux URP Flat Shaded Inputs.hlsl"
+
+            VertexOutput DepthNormalsVertex(VertexInput input)
+            {
+                VertexOutput output = (VertexOutput)0;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+
+                #if defined(_ALPHATEST_ON)
+                    output.uv.xy = TRANSFORM_TEX(input.texcoord, _BaseMap);
+                #endif
+
+                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
+
+                VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS, float4(1,1,1,1)); //input.tangentOS);
+                output.normalWS = NormalizeNormalPerVertex(normalInput.normalWS);
+                
+                return output;
+            }
+
+            half4 DepthNormalsFragment(VertexOutput input) : SV_TARGET
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
+                #if defined(_ALPHATEST_ON)
+                    half mask = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, input.uv.xy).a;
+                    clip (mask - _Cutoff);
+                #endif
+
+                float3 normal = input.normalWS;
+                return float4(PackNormalOctRectEncode(TransformWorldToViewDir(normal, true)), 0.0, 0.0);
             }
 
             ENDHLSL
@@ -552,6 +648,9 @@
                 outSurfaceData.normalTS = half3(0,0,1);
                 outSurfaceData.occlusion = 1;
                 outSurfaceData.emission = 0;
+
+                outSurfaceData.clearCoatMask = 0;
+                outSurfaceData.clearCoatSmoothness = 0;
             }
 
         //  Finally include the meta pass related stuff  

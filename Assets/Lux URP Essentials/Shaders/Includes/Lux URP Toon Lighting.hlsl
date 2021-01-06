@@ -1,4 +1,4 @@
-
+// NOTE: Based on URP Lighting.hlsl which replaced some half3 with floats to avoid lighting artifacts on mobile
 
 #ifndef UNIVERSAL_TOONLIGHTING_INCLUDED
 #define UNIVERSAL_TOONLIGHTING_INCLUDED
@@ -20,17 +20,17 @@
 //
 //  Custom functions
 
-half3 LightingSpecular_Toon (Light light, half NdotL, half3 normalWS, half3 viewDirectionWS, half3 specular, half specularSmoothness, half smoothness, half specularStep, half specularUpper, bool energyConservation){
+half3 LightingSpecular_Toon (Light light, half lightingRemap, half3 normalWS, half3 viewDirectionWS, half3 specular, half specularSmoothness, half smoothness, half specularStep, half specularUpper, bool energyConservation){
     half3 halfVec = SafeNormalize(light.direction + viewDirectionWS);
     half NdotH = saturate(dot(normalWS, halfVec));
     half modifier = pow(NdotH /* lightingRemap*/, specularSmoothness);
-//  Normalization? Na, we just multiply by smoothness in the return statement. This is toon lighting!
+//  Normalization? Na, we just multiply by smoothness in the return statement.
     // #define ONEOVERTWOPI 0.159155h
     // half normalization = (specularSmoothness + 1) * ONEOVERTWOPI;
 //  Sharpen
     half modifierSharpened = smoothstep(specularStep, specularUpper, modifier);
     half toonNormalization = (energyConservation == 1.0h) ? smoothness : 1;
-    return light.color * specular * modifierSharpened * toonNormalization;
+    return light.color * specular * modifierSharpened * toonNormalization; // * smoothness;
 }
 
 half3 LightingSpecularAniso_Toon (Light light, half NdotL, half3 normalWS, half3 viewDirectionWS, half3 tangentWS, half3 bitangentWS, half anisotropy, half3 specular, half specularSmoothness, half smoothness, half specularStep, half specularUpper, bool energyConservation){
@@ -82,9 +82,7 @@ half3 LightingSpecularAniso_Toon (Light light, half NdotL, half3 normalWS, half3
     return light.color * specular * modifierSharpened * toonNormalization; 
 }
 
-
-//  https://www.ronja-tutorials.com/2019/11/29/fwidth.html
-//
+// https://www.ronja-tutorials.com/2019/11/29/fwidth.html
 half aaStep(half compValue, half gradient, half softness){
     half change = fwidth(gradient) * softness;
 //  Base the range of the inverse lerp on the change over two pixels
@@ -116,10 +114,30 @@ half4 LuxURPToonFragmentPBR(InputData inputData,
     BRDFData brdfData;
 //  We can't use our specular here as it can be anything. So we simply use the default dielectric value here.
     InitializeBRDFData(albedo, metallic, kDieletricSpec.rgb, smoothness, alpha, brdfData);
-    
-    Light mainLight = GetMainLight(inputData.shadowCoord);
-    mainLight.shadowAttenuation = smoothstep( (1 - shadowFalloff) * shadowFalloff, shadowFalloff, mainLight.shadowAttenuation);
 
+
+//  ShadowMask: To ensure backward compatibility we have to avoid using shadowMask input, as it is not present in older shaders
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = inputData.shadowMask;
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+    
+    //Light mainLight = GetMainLight(inputData.shadowCoord);
+    Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS, shadowMask);
+
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        #if defined(_SSAO_ENABLED)
+            AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(inputData.normalizedScreenSpaceUV);
+            mainLight.color *= aoFactor.directAmbientOcclusion;
+            occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+        #endif
+    #endif
+    
+    mainLight.shadowAttenuation = smoothstep( (1 - shadowFalloff) * shadowFalloff, shadowFalloff, mainLight.shadowAttenuation);
     MixRealtimeAndBakedGI(mainLight, inputData.normalWS, inputData.bakedGI, half4(0, 0, 0, 0));
 
 //  We really do not want any reflections
@@ -208,6 +226,11 @@ half4 LuxURPToonFragmentPBR(InputData inputData,
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i) {
             Light light = GetAdditionalLight(i, inputData.positionWS);
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                #if defined(_SSAO_ENABLED)
+                    light.color *= aoFactor.directAmbientOcclusion;
+                #endif
+            #endif
             //light.shadowAttenuation = smoothstep(0.0h, shadowFalloff, light.shadowAttenuation);
             light.shadowAttenuation = smoothstep( (1.0h - shadowFalloff) * shadowFalloff, shadowFalloff, light.shadowAttenuation);
             
@@ -247,20 +270,15 @@ half4 LuxURPToonFragmentPBR(InputData inputData,
                     spec = LightingSpecular_Toon(light, NdotL, inputData.normalWS, inputData.viewDirectionWS, specular, specularSmoothness, smoothness, specularStep, specularUpper, energyConservation);
                 #endif
                 specularLighting += spec * atten;
-// testing diffuse only fill lights
-// int perObjectLightIndex = GetPerObjectLightIndex(i);
-// #if USE_STRUCTURED_BUFFER_FOR_LIGHT_DATA
-//     half4 lcolor = _AdditionalLightsBuffer[perObjectLightIndex].color;
-// #else
-//     half4 lcolor = _AdditionalLightsColor[perObjectLightIndex];
-// #endif
-//     specularLighting += spec * atten * lcolor.a;
             #endif
         }
     #endif
 
+
 //  Combine Lighting
     half3 litAlbedo = lerp(shadedAlbedo, albedo, saturate(lightIntensity.xxx) );
+
+//lightColor = 1;
 
     half3 Lighting =
     //  ambient diffuse lighting
@@ -284,7 +302,7 @@ half4 LuxURPToonFragmentPBR(InputData inputData,
     ;
 
 #ifdef _ADDITIONAL_LIGHTS_VERTEX
-        Lighting += inputData.vertexLighting * albedo;
+    Lighting += inputData.vertexLighting * albedo;
 #endif
     Lighting += emission;
     return half4(Lighting, alpha);

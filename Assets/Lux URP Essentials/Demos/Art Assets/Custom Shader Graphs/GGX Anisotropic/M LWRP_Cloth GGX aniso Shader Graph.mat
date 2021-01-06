@@ -8,8 +8,7 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: M LWRP_Cloth GGX aniso Shader Graph
-  m_Shader: {fileID: -6465566751694194690, guid: 82ab1dfcc6d9a284588187f50a3751b5,
-    type: 3}
+  m_Shader: {fileID: -6465566751694194690, guid: 82ab1dfcc6d9a284588187f50a3751b5, type: 3}
   m_ShaderKeywords: _MASKMAP _NORMALMAP _SCATTERING
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -46,6 +45,18 @@ Material:
         m_Offset: {x: 0, y: 0}
     - _SkinLUT:
         m_Texture: {fileID: 2800000, guid: 3b145faea86314d09ab42116437731c1, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     m_Floats:
@@ -108,3 +119,4 @@ Material:
     - _Specular: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 0.003921569}
     - _SubsurfaceColor: {r: 1, g: 0.39999998, b: 0.24999997, a: 1}
     - _Tiling: {r: 4, g: 4, b: 0, a: 0}
+  m_BuildTextureStacks: []

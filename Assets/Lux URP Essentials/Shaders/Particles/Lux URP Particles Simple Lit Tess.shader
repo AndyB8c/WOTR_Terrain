@@ -9,14 +9,14 @@
         [HeaderHelpLuxURP_URL(hgrc26wf1x5s)]
 
         [Header(Tessellation)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _Tess                        ("Tessellation", Range(1, 15)) = 3
         [LuxURPVectorTwoDrawer]
         _TessRange                              ("Near (X) Far (Y)", Vector) = (5,15,0,0)
 
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CompareFunction)]
         _ZTest                                  ("ZTest", Float) = 4 // "LessEqual"
         [Enum(UnityEngine.Rendering.CullMode)]
@@ -41,7 +41,7 @@
 
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         _BaseColor                              ("Base Color", Color) = (1,1,1,1)
         _BaseMap                                ("Base Map", 2D) = "white" {}
         _Cutoff                                 ("Alpha Cutoff", Range(0.0, 1.0)) = 0.5
@@ -164,8 +164,8 @@
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _NORMALMAP
-            #pragma shader_feature _EMISSION
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _EMISSION
 
             //#pragma shader_feature _SPECULARHIGHLIGHTS_OFF
             #pragma shader_feature _SPECULARHIGHLIGHTS_OFF _SPECGLOSSMAP _SPECULAR_COLOR
@@ -177,7 +177,7 @@
             #pragma shader_feature_local _PERVERTEX_SAMPLEOFFSET
             #pragma shader_feature_local _ADDITIONALLIGHT_SHADOWS
 
-            #pragma shader_feature_local _TRANSMISSION
+            #pragma shader_feature_local_fragment _TRANSMISSION
 
             // -------------------------------------
             // Particle Keywords
@@ -190,14 +190,12 @@
             #pragma shader_feature _DISTORTION_ON
             
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
-            
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            
-            #pragma multi_compile _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
             #if defined(_SHADOWS_SOFT) && defined(_PERVERTEX_SHADOWS)
                 #undef _SHADOWS_SOFT
             #endif
@@ -205,6 +203,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             // -------------------------------------
             // Unity defined keywords

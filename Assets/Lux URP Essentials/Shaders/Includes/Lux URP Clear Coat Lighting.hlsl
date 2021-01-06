@@ -164,7 +164,6 @@ half4 LuxClearCoatFragmentPBR(InputData inputData, half3 albedo, half metallic, 
     BRDFData brdfData;
     InitializeBRDFData(albedo, metallic, specular, smoothness, alpha, brdfData);
 
-
     //#if defined(_ADJUSTSPEC)
 //        brdfData.specular = lerp(brdfData.specular, ConvertF0ForAirInterfaceToF0ForClearCoat15(brdfData.specular), clearcoatThickness);
           brdfData.specular = lerp(brdfData.specular, f0ClearCoatToSurface_Lux(brdfData.specular), clearcoatThickness);
@@ -212,11 +211,29 @@ half4 LuxClearCoatFragmentPBR(InputData inputData, half3 albedo, half metallic, 
         }
     #endif
 
-    Light mainLight = GetMainLight(inputData.shadowCoord);
+//  ShadowMask: To ensure backward compatibility we have to avoid using shadowMask input, as it is not present in older shaders
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = inputData.shadowMask;
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS, shadowMask);
+    //Light mainLight = GetMainLight(inputData.shadowCoord);
+
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(inputData.normalizedScreenSpaceUV);
+        mainLight.color *= aoFactor.directAmbientOcclusion;
+        occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+    #endif    
+
     MixRealtimeAndBakedGI(mainLight, addData.normalWS, inputData.bakedGI, half4(0, 0, 0, 0));
 
 //  Approximation of refraction on BRDF
-    half refractionScale = ((NdotV * 0.5 + 0.5) * NdotV - 1.0) * saturate(1.25 - 1.25 * (1.0 - clearcoatSmoothness)) + 1;
+    half refractionScale = ((NdotV * 0.5h + 0.5h) * NdotV - 1.0h) * saturate(1.25h - 1.25h * (1.0h - clearcoatSmoothness)) + 1.0h;
     brdfData.diffuse = lerp(brdfData.diffuse, brdfData.diffuse * refractionScale, clearcoatThickness);
 //  brdfData.specular = brdfData.specular * lerp(1.0, refractionScale, clearcoatThickness);
 
@@ -234,7 +251,12 @@ half4 LuxClearCoatFragmentPBR(InputData inputData, half3 albedo, half metallic, 
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i)
         {
-            Light light = GetAdditionalLight(i, inputData.positionWS);
+            // Light light = GetAdditionalPerObjectLight(i, inputData.positionWS); // here; shadowAttenuation = 1.0;
+        //  URP 10: We have to use the new GetAdditionalLight function
+            Light light = GetAdditionalLight(i, inputData.positionWS, shadowMask);
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                light.color *= aoFactor.directAmbientOcclusion;
+            #endif
             color += LightingPhysicallyBased_LuxClearCoat(brdfData, addData, light, inputData.normalWS, inputData.viewDirectionWS);
         }
     #endif
@@ -243,11 +265,6 @@ half4 LuxClearCoatFragmentPBR(InputData inputData, half3 albedo, half metallic, 
         color += inputData.vertexLighting * brdfData.diffuse;
     #endif
 
-if (addData.coatThickness == 0.0h) {
-//color  = half3(1,0,0);
-}
-
-//color = clearcoatSmoothness.xxx;
     color += emission;
     return half4(color, alpha);
 }

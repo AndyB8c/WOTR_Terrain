@@ -8,13 +8,13 @@ Shader "Lux URP/Clear Coat"
         [HeaderHelpLuxURP_URL(vw98j94c4183)]
         
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff(_RECEIVE_SHADOWS_OFF)]
         _ReceiveShadows             ("Receive Shadows", Float) = 1.0
         
 
         [Header(Clear Coat Inputs)]
-        [Space(5)]
+        [Space(8)]
         _ClearCoatThickness         ("Clear Coat", Range(0.0, 1.0)) = 0.5
         _ClearCoatSmoothness        ("Clear Coat Smoothness", Range(0.0, 1.0)) = 0.5
         _ClearCoatSpecular          ("Clear Coat Specular", Color) = (0.2, 0.2, 0.2)
@@ -27,7 +27,7 @@ Shader "Lux URP/Clear Coat"
         
 
         [Header(Base Layer Inputs)]
-        [Space(5)]
+        [Space(8)]
         [MainColor]
         _BaseColor                  ("Color", Color) = (1,1,1,1)
         
@@ -62,7 +62,7 @@ Shader "Lux URP/Clear Coat"
 
 
         [Header(Rim Lighting)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_RIMLIGHTING)]
         _Rim                        ("Enable Rim Lighting", Float) = 0
         [HDR] _RimColor             ("Rim Color", Color) = (0.5,0.5,0.5,1)
@@ -73,7 +73,7 @@ Shader "Lux URP/Clear Coat"
 
 
         [Header(Stencil)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _Stencil         ("Stencil Reference", Range (0, 255)) = 0
         [IntRange] _ReadMask        ("     Read Mask", Range (0, 255)) = 255
         [IntRange] _WriteMask       ("     Write Mask", Range (0, 255)) = 255
@@ -88,7 +88,7 @@ Shader "Lux URP/Clear Coat"
 
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         //[ToggleOff]
         //_SpecularHighlights         ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
@@ -100,6 +100,10 @@ Shader "Lux URP/Clear Coat"
     //  Lightmapper and outline selection shader need _MainTex, _Color and _Cutoff
         [HideInInspector] _MainTex  ("Albedo", 2D) = "white" {}
         [HideInInspector] _Color    ("Color", Color) = (1,1,1,1)
+    
+    //  URP 10.1. needs this for the depthnormal pass 
+        [HideInInspector] _Cutoff   ("     Threshold", Range(0.0, 1.0)) = 0.5
+        [HideInInspector] _Surface("__surface", Float) = 0.0
     }
 
     SubShader
@@ -148,7 +152,7 @@ Shader "Lux URP/Clear Coat"
             #pragma shader_feature_local _MASKMAPSECONDARY
             #pragma shader_feature_local _SECONDARYLOBE
 
-            #pragma shader_feature _NORMALMAP
+            #pragma shader_feature_local _NORMALMAP
             #pragma shader_feature_local _RIMLIGHTING
 
             //#pragma shader_feature _SPECULARHIGHLIGHTS_OFF
@@ -157,13 +161,15 @@ Shader "Lux URP/Clear Coat"
 
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -174,6 +180,7 @@ Shader "Lux URP/Clear Coat"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
         //  Include base inputs and all other needed "base" includes
             #include "Includes/Lux URP Clear Coat Inputs.hlsl"
@@ -327,6 +334,10 @@ Shader "Lux URP/Clear Coat"
                 inputData.fogCoord = input.fogFactorAndVertexLight.x;
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+
+                //inputData.normalizedScreenSpaceUV = input.positionCS.xy;
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
             }
 
             half4 LitPassFragment(VertexOutput input) : SV_Target
@@ -367,9 +378,9 @@ Shader "Lux URP/Clear Coat"
                     _ClearCoatSpecular,
                     NormalizeNormalPerPixel(input.normalWS.xyz),
                     #if defined (_BASECOLORMAP)
-                        _BaseColor * surfaceData.albedo,
+                        _BaseColor.rgb * surfaceData.albedo,
                     #else
-                        _BaseColor,
+                        _BaseColor.rgb,
                     #endif
                     _SecondaryColor
                 );    
@@ -406,6 +417,7 @@ Shader "Lux URP/Clear Coat"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
@@ -469,6 +481,7 @@ Shader "Lux URP/Clear Coat"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
             
             #define DEPTHONLYPASS
             #include "Includes/Lux URP Clear Coat Inputs.hlsl"
@@ -491,6 +504,40 @@ Shader "Lux URP/Clear Coat"
                 return 0;
             }
 
+            ENDHLSL
+        }
+
+    //  Depth Normal ---------------------------------------------
+        // This pass is used when drawing to a _CameraNormalsTexture texture
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            #pragma exclude_renderers d3d11_9x gles
+            #pragma target 4.5
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local _NORMALMAP
+            //#pragma shader_feature_local_fragment _ALPHATEST_ON
+            //#pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+
+            //#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+            #include "Includes/Lux URP Clear Coat Inputs.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
             ENDHLSL
         }
 
@@ -528,6 +575,9 @@ Shader "Lux URP/Clear Coat"
                 outSurfaceData.normalTS = half3(0,0,1);
                 outSurfaceData.occlusion = 1;
                 outSurfaceData.emission = 0;
+
+                outSurfaceData.clearCoatMask = 0;
+                outSurfaceData.clearCoatSmoothness = 0;
             }
 
         //  Finally include the meta pass related stuff  

@@ -68,6 +68,7 @@ void Lighting_half(
 
 //  Lightmapping
     float2 lightMapUV,
+    bool receiveSSAO,
 
 //  Final lit color
     out half3 Lighting,
@@ -96,6 +97,47 @@ void Lighting_half(
     half diffuseUpper = saturate(diffuseStep + diffuseFalloff);
     //rimFalloff *= 20.0h;
 
+    float4 clipPos = TransformWorldToHClip(positionWS);
+//  Get Shadow Sampling Coords / Unfortunately per pixel...
+    #if SHADOWS_SCREEN
+        float4 shadowCoord = ComputeScreenPos(clipPos);
+    #else
+        float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
+    #endif
+
+//  Shadow mask 
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = SAMPLE_SHADOWMASK(lightMapUV);
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    //Light mainLight = GetMainLight(shadowCoord);
+    Light mainLight = GetMainLight(shadowCoord, positionWS, shadowMask);
+
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        AmbientOcclusionFactor aoFactor;
+        aoFactor.indirectAmbientOcclusion = 1;
+        aoFactor.directAmbientOcclusion = 1;
+        if(receiveSSAO) {
+            float4 ndc = clipPos * 0.5f;
+            float2 normalized = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;
+            normalized /= clipPos.w;
+            normalized *= _ScreenParams.xy;
+        //  We could also use IN.Screenpos(default) --> ( IN.Screenpos.xy * _ScreenParams.xy)
+        //  HDRP 10.1
+            normalized = GetNormalizedScreenSpaceUV(normalized);
+            aoFactor = GetScreenSpaceAmbientOcclusion(normalized);
+            mainLight.color *= aoFactor.directAmbientOcclusion;
+            occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+
+            occlusion = smoothstep(diffuseStep, diffuseUpper, occlusion);
+        }
+    #endif
+
 //  GI Lighting
     half3 bakedGI;
     #ifdef LIGHTMAP_ON
@@ -104,19 +146,9 @@ void Lighting_half(
     #else
 //  CHECK: Do we have3 to multiply SH with occlusion here?
         bakedGI = SampleSH(normalWS) * occlusion; 
-    #endif
+    #endif    
 
-//  Get Shadow Sampling Coords / Unfortunately per pixel...
-    #if SHADOWS_SCREEN
-        float4 clipPos = TransformWorldToHClip(positionWS);
-        float4 shadowCoord = ComputeScreenPos(clipPos);
-    #else
-        float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
-    #endif
-
-    Light mainLight = GetMainLight(shadowCoord);
-    //mainLight.shadowAttenuation = smoothstep(0.0h, shadowFalloff, mainLight.shadowAttenuation);
-    mainLight.shadowAttenuation = smoothstep( (1 - shadowFalloff) * shadowFalloff, shadowFalloff, mainLight.shadowAttenuation);
+    mainLight.shadowAttenuation = smoothstep(0.0h, shadowFalloff, mainLight.shadowAttenuation);
 
     MixRealtimeAndBakedGI(mainLight, normalWS, bakedGI, half4(0, 0, 0, 0));
 
@@ -131,10 +163,6 @@ void Lighting_half(
 //  Main Light
     half NdotL = saturate(dot(normalWS, mainLight.direction)); 
     NdotL = smoothstep(diffuseStep, diffuseUpper, NdotL);
-//  NdotL = (dot(normalWS, mainLight.direction));
-//  NdotL = (NdotL + 1) * 0.5;
-//  NdotL = floor(NdotL * 4) * 0.25;
-
     half atten = NdotL * mainLight.distanceAttenuation * saturate(shadowBiasDirectional + mainLight.shadowAttenuation);
 
     if (colorizeMainLight) {
@@ -170,9 +198,15 @@ void Lighting_half(
     #ifdef _ADDITIONAL_LIGHTS
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i) {
-            Light light = GetAdditionalLight(i, positionWS);
-            //light.shadowAttenuation = smoothstep(0.0h, shadowFalloff, light.shadowAttenuation);
-            light.shadowAttenuation = smoothstep( (1 - shadowFalloff) * shadowFalloff, shadowFalloff, light.shadowAttenuation);
+            // Light light = GetAdditionalPerObjectLight(index, positionWS); // here; shadowAttenuation = 1.0;
+        //  URP 10: We have to use the new GetAdditionalLight function
+            Light light = GetAdditionalLight(i, positionWS, shadowMask);
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                if(receiveSSAO) {
+                    light.color *= aoFactor.directAmbientOcclusion;
+                }
+            #endif
+            light.shadowAttenuation = smoothstep(0.0h, shadowFalloff, light.shadowAttenuation);
 
             NdotL = saturate(dot(normalWS, light.direction)); 
             NdotL = smoothstep(diffuseStep, diffuseUpper, NdotL);
@@ -198,7 +232,8 @@ void Lighting_half(
     half3 litAlbedo = lerp(shadedAlbedo, albedo, saturate(lightIntensity.xxx) );
     Lighting =
     //  ambient diffuse lighting
-        bakedGI * albedo 			// litAlbedo // used to use this?
+        //bakedGI * litAlbedo //   <---------- was wrong!
+        bakedGI * albedo
     //  direct diffuse lighting
         + litAlbedo * lightColor
         + (specularLighting * lightIntensity
@@ -268,6 +303,7 @@ void Lighting_float(
 
 //  Lightmapping
     float2 lightMapUV,
+    bool receiveSSAO,
 
 //  Final lit color
     out half3 Lighting,
@@ -280,6 +316,7 @@ void Lighting_float(
         albedo, shadedAlbedo, enableSpecular, specular, smoothness, occlusion,
         diffuseStep, diffuseFalloff, specularStep, specularFalloff, shadowFalloff, shadowBiasDirectional, shadowBiasAdditional, colorizeMainLight, colorizeAddLights,
         enableRimLighting, rimPower, rimFalloff, rimColor, rimAttenuation,
-        lightMapUV, Lighting, MetaAlbedo, MetaSpecular
+        lightMapUV, receiveSSAO,
+        Lighting, MetaAlbedo, MetaSpecular
     );
 }

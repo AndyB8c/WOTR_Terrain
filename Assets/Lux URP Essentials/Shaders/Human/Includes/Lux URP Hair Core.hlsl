@@ -20,7 +20,7 @@
 
                 output.uv.xy = input.texcoord;
 
-            //  Hair lighting always needs tangent and bitangent
+            //  Hair lighting always needs tangent
                 output.viewDirWS = viewDirWS;
                 output.normalWS = normalInput.normalWS;
                 float sign = input.tangentOS.w * GetOddNegativeScale();
@@ -57,7 +57,6 @@
                 return frac(Ret);
             }
 
-            //inline void InitializeHairLitSurfaceData(float2 uv, float4 screenPos, half fade, half4 vertexColor, out SurfaceDescription outSurfaceData)
             inline void InitializeHairLitSurfaceData(float2 uv, half4 vertexColor, out SurfaceDescription outSurfaceData)
             {
                 half4 albedoAlpha = SampleAlbedoAlpha(uv, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap));
@@ -125,6 +124,9 @@
                 inputData.fogCoord = input.fogFactorAndVertexLight.x;
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+
+                //inputData.normalizedScreenSpaceUV = input.positionCS.xy;
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
             }
 
             half4 LitPassFragment(VertexOutput input
@@ -138,7 +140,6 @@
 
             //  Get the surface description
                 SurfaceDescription surfaceData;
-                //InitializeHairLitSurfaceData(input.uv.xy, input.screenPos, input.fade, input.color, surfaceData);
                 InitializeHairLitSurfaceData(input.uv.xy, input.color, surfaceData);
 
             //  Handle VFACE
@@ -148,7 +149,6 @@
 
             //  Prepare surface data (like bring normal into world space and get missing inputs like gi
                 InputData inputData;
-                float3 bitangent;
                 InitializeInputData(input, surfaceData.normalTS, inputData);
 
                 #if defined(_RIMLIGHTING)
@@ -165,7 +165,7 @@
                 half4 color = LuxURPHairFragment(
                     inputData,
                     input.tangentWS.xyz,
-                    surfaceData.albedo * lerp(_SecondaryColor.rgb, _BaseColor.rgb, input.color.a), //_BaseColor.rgb,
+                    surfaceData.albedo * lerp(_SecondaryColor.rgb, _BaseColor.rgb, input.color.a),
                     surfaceData.specular,
                     surfaceData.occlusion,
                     surfaceData.emission,
@@ -179,12 +179,9 @@
                     _RimTransmissionIntensity,
                     _AmbientReflection
                 );
-                
                 color.a =  surfaceData.alpha;   
-
             //  Add fog
                 color.rgb = MixFog(color.rgb, inputData.fogCoord);
-
                 return color;
             }
 

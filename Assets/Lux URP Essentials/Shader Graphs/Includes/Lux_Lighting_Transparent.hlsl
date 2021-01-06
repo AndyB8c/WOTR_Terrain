@@ -72,9 +72,31 @@ void Lighting_half(
 
     BRDFData brdfData;
     InitializeBRDFData(albedo, metallic, specular, smoothness, alpha, brdfData);
-    FinalLighting = GlobalIllumination(brdfData, bakedGI, occlusion, normalWS, viewDirectionWS);
 
-    Light mainLight = GetMainLight();
+    float4 clipPos = TransformWorldToHClip(positionWS);
+
+//  Get Shadow Sampling Coords / Unfortunately per pixel...
+    #if SHADOWS_SCREEN
+        float4 shadowCoord = ComputeScreenPos(clipPos);
+    #else
+        float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
+    #endif
+
+//  Shadow mask 
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = SAMPLE_SHADOWMASK(lightMapUV);
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    //Light mainLight = GetMainLight(shadowCoord);
+    Light mainLight = GetMainLight(shadowCoord, positionWS, shadowMask);
+
+//  SSAO - no ssao here as it does not write into the depth/depthnormal buffer
+        
+    FinalLighting = GlobalIllumination(brdfData, bakedGI, occlusion, normalWS, viewDirectionWS);
     MixRealtimeAndBakedGI(mainLight, normalWS, bakedGI, half4(0, 0, 0, 0));
 
 //  GetMainLight will return screen space shadows.
@@ -93,7 +115,9 @@ void Lighting_half(
     #ifdef _ADDITIONAL_LIGHTS
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i) {
-            Light light = GetAdditionalLight(i, positionWS);
+            // Light light = GetAdditionalPerObjectLight(index, positionWS); // here; shadowAttenuation = 1.0;
+        //  URP 10: We have to use the new GetAdditionalLight function
+            Light light = GetAdditionalLight(i, positionWS, shadowMask);
             FinalLighting += LightingPhysicallyBased(brdfData, light, normalWS, viewDirectionWS);
         }
     #endif

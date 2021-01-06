@@ -99,7 +99,7 @@
         half3 GlobalIllumination_LuxClearCoat(BRDFData brdfData, AdditionalData addData, half3 bakedGI, half occlusion, half3 normalWS, half3 baseNormalWS, half3 viewDirectionWS, half NdotV)
         {
             half3 reflectVector = reflect(-viewDirectionWS, normalWS);
-            half fresnelTerm = Pow4(1.0h - NdotV);
+            half fresnelTerm = Pow4(1.0 - NdotV);
 
             half3 indirectDiffuse = bakedGI * occlusion; 
             half3 indirectSpecular = GlossyEnvironmentReflection(reflectVector, addData.perceptualRoughness, addData.specOcclusion);
@@ -238,16 +238,41 @@ void Lighting_half(
 
     addData.enableSecondaryLobe = enableSecondaryLobe;
 
-
+    float4 clipPos = TransformWorldToHClip(positionWS);
 //  Get Shadow Sampling Coords / Unfortunately per pixel...
     #if SHADOWS_SCREEN
-        float4 clipPos = TransformWorldToHClip(positionWS);
         float4 shadowCoord = ComputeScreenPos(clipPos);
     #else
         float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
     #endif
 
-    Light mainLight = GetMainLight(shadowCoord);
+//  Shadow mask 
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = SAMPLE_SHADOWMASK(lightMapUV);
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    //Light mainLight = GetMainLight(shadowCoord);
+    Light mainLight = GetMainLight(shadowCoord, positionWS, shadowMask);
+
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        float4 ndc = clipPos * 0.5f;
+        float2 normalized = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;
+        normalized /= clipPos.w;
+        normalized *= _ScreenParams.xy;
+    //  We could also use IN.Screenpos(default) --> ( IN.Screenpos.xy * _ScreenParams.xy)
+    //  HDRP 10.1
+        normalized = GetNormalizedScreenSpaceUV(normalized);
+
+        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(normalized);
+        mainLight.color *= aoFactor.directAmbientOcclusion;
+        occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+    #endif
+    
     MixRealtimeAndBakedGI(mainLight, normalWS, bakedGI, half4(0, 0, 0, 0));
 
 //  Approximation of refraction on BRDF
@@ -264,7 +289,12 @@ void Lighting_half(
     #ifdef _ADDITIONAL_LIGHTS
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i) {
-            Light light = GetAdditionalLight(i, positionWS);
+        //  Light light = GetAdditionalPerObjectLight(index, positionWS); // here; shadowAttenuation = 1.0;
+        //  URP 10: We have to use the new GetAdditionalLight function
+            Light light = GetAdditionalLight(i, positionWS, shadowMask);
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                light.color *= aoFactor.directAmbientOcclusion;
+            #endif
             FinalLighting += LightingPhysicallyBased_LuxClearCoat(brdfData, addData, light, normalWS, viewDirectionWS);
         }
     #endif

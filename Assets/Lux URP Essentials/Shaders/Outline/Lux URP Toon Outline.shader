@@ -4,7 +4,7 @@
     {
         [HeaderHelpLuxURP_URL(68hb5r7b3dnz)]
 
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest ("ZTest", Int) = 4
         [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Culling", Float) = 1
 
@@ -55,6 +55,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
             
             #pragma vertex vert
             #pragma fragment frag

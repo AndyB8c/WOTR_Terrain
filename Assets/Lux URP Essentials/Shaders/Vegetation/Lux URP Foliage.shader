@@ -8,7 +8,9 @@ Shader "Lux URP/Vegetation/Foliage"
         [HeaderHelpLuxURP_URL(iwibq8un2c3h)]
         
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
+        [Enum(UnityEngine.Rendering.CullMode)]
+        _Cull                       ("Culling", Float) = 0
         [Toggle(_ALPHATEST_ON)]
         _AlphaClip                  ("Alpha Clipping", Float) = 1.0
         _Cutoff                     ("     Threshold", Range(0.0, 1.0)) = 0.5
@@ -16,7 +18,7 @@ Shader "Lux URP/Vegetation/Foliage"
         _ReceiveShadows             ("Receive Shadows", Float) = 1.0
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [NoScaleOffset][MainTexture]
         _BaseMap                    ("Albedo (RGB) Alpha (A)", 2D) = "white" {}
         [HideInInspector][MainColor]
@@ -35,7 +37,7 @@ Shader "Lux URP/Vegetation/Foliage"
         _GlossMapScale              ("     Smoothness Scale", Range(0.0, 1.0)) = 1.0
 
         [Header(Transmission)]
-        [Space(5)]
+        [Space(8)]
         _TranslucencyPower          ("Power", Range(0.0, 10.0)) = 7.0
         _TranslucencyStrength       ("Strength", Range(0.0, 1.0)) = 1.0
         _ShadowStrength             ("Shadow Strength", Range(0.0, 1.0)) = 0.7
@@ -43,7 +45,7 @@ Shader "Lux URP/Vegetation/Foliage"
         _Distortion                 ("Distortion", Range(0.0, 0.1)) = 0.01
 
         [Header(Wind)]
-        [Space(5)]
+        [Space(8)]
         [KeywordEnum(Texture, Math)]
         _Wind                       ("Wind Input", Float) = 0
         [LuxURPWindFoliageDrawer]
@@ -51,19 +53,16 @@ Shader "Lux URP/Vegetation/Foliage"
         _SampleSize                 ("Sample Size", Range(0.0, 1.0)) = 0.5
 
         [Header(Distance Fading)]
-        [Space(5)]
+        [Space(8)]
         [LuxLWRPDistanceFadeDrawer]
         _DistanceFade               ("Distance Fade Params", Vector) = (2500, 0.001, 0, 0)
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff]
         _SpecularHighlights         ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
         _EnvironmentReflections     ("Environment Reflections", Float) = 1.0
-
-    //  Needed by the inspector
-        [HideInInspector] _Culling  ("Culling", Float) = 0.0
 
     //  Lightmapper and outline selection shader need _MainTex, _Color and _Cutoff
         [HideInInspector] _MainTex  ("Albedo", 2D) = "white" {}
@@ -75,45 +74,49 @@ Shader "Lux URP/Vegetation/Foliage"
         Tags
         {
             "RenderPipeline" = "UniversalPipeline"
-            "RenderType" = "TransparentCutout"
+            "RenderType" = "Opaque"                     // "RenderType" = "TransparentCutout" // Gets adjusted by inspector
             "IgnoreProjector" = "True"
-            "Queue"="AlphaTest"
+            "Queue"="Geometry"                          // "Queue"="AlphaTest" // Gets adjusted by inspector
+            "ShaderModel"="4.5"
         }
-        LOD 100
+        LOD 300
 
         Pass
         {
+            Name "ForwardLit"
             Tags{"LightMode" = "UniversalForward"}
             ZWrite On
-            Cull Off
+            Cull[_Cull]
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard SRP library
+             // Required to compile gles 2.0 with standard srp library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-
-        //  Shader target needs to be 3.0 due to tex2Dlod in the vertex shader and VFACE
-            #pragma target 3.0
+            #pragma target 2.0
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature_local _ALPHATEST_ON
             #define _SPECULAR_SETUP 1
-            #pragma shader_feature _NORMALMAP
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
             #pragma shader_feature_local _WIND_MATH
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -124,6 +127,7 @@ Shader "Lux URP/Vegetation/Foliage"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
         //  Include base inputs and all other needed "base" includes
             #include "Includes/Lux URP Foliage Inputs.hlsl"
@@ -287,6 +291,9 @@ Shader "Lux URP/Vegetation/Foliage"
                 #if !defined(_NORMALMAP) && !defined(LIGHTMAP_ON)
                     inputData.bakedGI = SampleSH(inputData.normalWS);
                 #endif
+
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
             }
 
             half4 LitPassFragment(VertexOutput input, half facing : VFACE) : SV_Target
@@ -319,7 +326,6 @@ Shader "Lux URP/Vegetation/Foliage"
 
             //  Add fog
                 color.rgb = MixFog(color.rgb, inputData.fogCoord);
-
                 return color;
             }
 
@@ -336,17 +342,18 @@ Shader "Lux URP/Vegetation/Foliage"
 
             ZWrite On
             ZTest LEqual
-            Cull Off
+            ColorMask 0
+            Cull[_Cull]
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard srp library
+             // Required to compile gles 2.0 with standard srp library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-            #pragma target 3.0
+            #pragma target 2.0
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature_local _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
 
             #pragma shader_feature_local _WIND_MATH
 
@@ -354,6 +361,7 @@ Shader "Lux URP/Vegetation/Foliage"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
@@ -421,26 +429,27 @@ Shader "Lux URP/Vegetation/Foliage"
 
             ZWrite On
             ColorMask 0
-            Cull Off
+            Cull[_Cull]
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard srp library
+             // Required to compile gles 2.0 with standard srp library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-            #pragma target 3.0
+            #pragma target 2.0
 
             #pragma vertex DepthOnlyVertex
             #pragma fragment DepthOnlyFragment
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature_local _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
 
             #pragma shader_feature_local _WIND_MATH
 
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
             
             #define DEPTHONLYPASS
             #include "Includes/Lux URP Foliage Inputs.hlsl"
@@ -498,6 +507,99 @@ Shader "Lux URP/Vegetation/Foliage"
             ENDHLSL
         }
 
+        //  Depth Normal -----------------------------------------------------
+
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+             // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+
+            #pragma shader_feature_local _WIND_MATH
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+            
+            #define DEPTNORMALPASS
+            #include "Includes/Lux URP Foliage Inputs.hlsl"
+
+            VertexOutput DepthNormalsVertex(VertexInput input)
+            {
+                VertexOutput output = (VertexOutput)0;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+
+            //  Set distance fade value
+                float3 worldInstancePos = UNITY_MATRIX_M._m03_m13_m23;
+                float3 diff = (_WorldSpaceCameraPos - worldInstancePos);
+                float dist = dot(diff, diff);
+                output.fade = saturate( (_DistanceFade.x - dist) * _DistanceFade.y );
+
+            //  Shrink mesh if alpha testing is disabled
+                #if !defined(_ALPHATEST_ON)
+                    input.positionOS.xyz *= output.fade;
+                #endif
+
+            //  Wind in Object Space -------------------------------
+                animateVertex(input.color, input.normalOS.xyz, input.positionOS.xyz);
+            //  End Wind -------------------------------
+
+                VertexPositionInputs vertexInput;
+                vertexInput.positionWS = TransformObjectToWorld(input.positionOS.xyz);
+
+                VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS, float4(1,1,1,1)); //input.tangentOS);
+
+            //  We have to recalculate ClipPos! / see: GetVertexPositionInputs in Core.hlsl
+                vertexInput.positionVS = TransformWorldToView(vertexInput.positionWS);
+                vertexInput.positionCS = TransformWorldToHClip(vertexInput.positionWS);
+                float4 ndc = vertexInput.positionCS * 0.5f;
+                vertexInput.positionNDC.xy = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;
+                vertexInput.positionNDC.zw = vertexInput.positionCS.zw;
+            //  End Wind -------------------------------                
+
+                output.uv.xy = input.texcoord;
+                output.positionCS = vertexInput.positionCS;
+                output.normalWS = normalInput.normalWS;
+                return output;
+            }
+
+            half4 DepthNormalsFragment(VertexOutput input) : SV_TARGET
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+                #if defined(_ALPHATEST_ON)
+                    half alpha = SampleAlbedoAlpha(input.uv.xy, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap)).a;
+                    alpha *= input.fade;
+                    clip(alpha - _Cutoff);
+                #endif
+                float3 normal = input.normalWS;
+                normal = TransformWorldToViewDir(normal, true);
+                normal.z = abs(normal.z);
+                return float4(PackNormalOctRectEncode(normal), 0.0, 0.0);
+
+            }
+
+            ENDHLSL
+        }
+
     //  Meta -----------------------------------------------------
         
         Pass
@@ -509,12 +611,13 @@ Shader "Lux URP/Vegetation/Foliage"
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard srp library
             #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
 
             #pragma vertex UniversalVertexMeta
             #pragma fragment UniversalFragmentMeta
 
             #define _SPECULAR_SETUP
-            #pragma shader_feature_local _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
 
         //  First include all our custom stuff
             #include "Includes/Lux URP Foliage Inputs.hlsl"
@@ -533,6 +636,9 @@ Shader "Lux URP/Vegetation/Foliage"
                 outSurfaceData.normalTS = half3(0,0,1); //SampleNormal(uv, TEXTURE2D_ARGS(_BumpMap, sampler_BumpMap));
                 outSurfaceData.occlusion = 1;
                 outSurfaceData.emission = 0;
+
+                outSurfaceData.clearCoatMask = 0;
+                outSurfaceData.clearCoatSmoothness = 0;
             }
 
         //  Finally include the meta pass related stuff  

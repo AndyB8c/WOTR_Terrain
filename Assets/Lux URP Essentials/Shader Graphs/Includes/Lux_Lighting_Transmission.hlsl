@@ -74,17 +74,44 @@ void Lighting_half(
     BRDFData brdfData;
     InitializeBRDFData(albedo, metallic, specular, smoothness, alpha, brdfData);
 
-    FinalLighting = GlobalIllumination(brdfData, bakedGI, occlusion, normalWS, viewDirectionWS);
+    float4 clipPos = TransformWorldToHClip(positionWS);
 
 //  Get Shadow Sampling Coords / Unfortunately per pixel...
     #if SHADOWS_SCREEN
-        float4 clipPos = TransformWorldToHClip(positionWS);
         float4 shadowCoord = ComputeScreenPos(clipPos);
     #else
         float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
     #endif
 
-    Light mainLight = GetMainLight(shadowCoord);
+//  Shadow mask 
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = SAMPLE_SHADOWMASK(lightMapUV);
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    //Light mainLight = GetMainLight(shadowCoord);
+    Light mainLight = GetMainLight(shadowCoord, positionWS, shadowMask);
+    half3 mainLightColor = mainLight.color;
+
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        float4 ndc = clipPos * 0.5f;
+        float2 normalized = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;
+        normalized /= clipPos.w;
+        normalized *= _ScreenParams.xy;
+    //  We could also use IN.Screenpos(default) --> ( IN.Screenpos.xy * _ScreenParams.xy)
+    //  HDRP 10.1
+        normalized = GetNormalizedScreenSpaceUV(normalized);
+        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(normalized);
+        mainLight.color *= aoFactor.directAmbientOcclusion;
+        occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+    #endif
+    
+    FinalLighting = GlobalIllumination(brdfData, bakedGI, occlusion, normalWS, viewDirectionWS);
+
     MixRealtimeAndBakedGI(mainLight, normalWS, bakedGI, half4(0, 0, 0, 0));
 
 //  Main Light
@@ -94,27 +121,32 @@ void Lighting_half(
     half transDot = dot( transLightDir, -viewDirectionWS );
     transDot = exp2(saturate(transDot) * transmissionPower - transmissionPower);
     half NdotL = saturate(dot(normalWS, mainLight.direction));
-    FinalLighting += brdfData.diffuse * transDot * (1.0 - NdotL) * mainLight.color * lerp(1.0h, mainLight.shadowAttenuation, transmissionShadowstrength) * transmissionStrength * 4;
+    FinalLighting += brdfData.diffuse * transDot * (1.0h - NdotL) * mainLightColor * lerp(1.0h, mainLight.shadowAttenuation, transmissionShadowstrength) * transmissionStrength * 4;
 
 //  Handle additional lights
     #ifdef _ADDITIONAL_LIGHTS
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i) {
-            //Light light = GetAdditionalLight(i, positionWS);
-            //  Get index upfront as we need it for GetAdditionalLightShadowParams();
+        //  Get index upfront as we need it for GetAdditionalLightShadowParams();
             int index = GetPerObjectLightIndex(i);
-            Light light = GetAdditionalPerObjectLight(index, positionWS);
+            // Light light = GetAdditionalPerObjectLight(index, positionWS); // here; shadowAttenuation = 1.0;
+        //  URP 10: We have to use the new GetAdditionalLight function
+            Light light = GetAdditionalLight(i, positionWS, shadowMask);
+            half3 lightColor = light.color;
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                light.color *= aoFactor.directAmbientOcclusion;
+            #endif
             FinalLighting += LightingPhysicallyBased(brdfData, light, normalWS, viewDirectionWS);
 
-half4 shadowParams = GetAdditionalLightShadowParams(index);
-light.color *= lerp(1, shadowParams.x, transmissionMaskByShadowstrength); // shadowParams.x == shadow strength, which is 0 for point lights
+        //  Transmission
+            half4 shadowParams = GetAdditionalLightShadowParams(index);
+            lightColor *= lerp(1, shadowParams.x, transmissionMaskByShadowstrength); // shadowParams.x == shadow strength, which is 0 for point lights
 
-        //  translucency
             transLightDir = light.direction + normalWS * transmissionDistortion;
             transDot = dot( transLightDir, -viewDirectionWS );
             transDot = exp2(saturate(transDot) * transmissionPower - transmissionPower);
             NdotL = saturate(dot(normalWS, light.direction));
-            FinalLighting += brdfData.diffuse * transDot * (1.0 - NdotL) * light.color * lerp(1.0h, light.shadowAttenuation, transmissionShadowstrength) * light.distanceAttenuation * transmissionStrength * 4;
+            FinalLighting += brdfData.diffuse * transDot * (1.0h - NdotL) * lightColor * lerp(1.0h, light.shadowAttenuation, transmissionShadowstrength) * light.distanceAttenuation * transmissionStrength * 4;
         }
     #endif
 

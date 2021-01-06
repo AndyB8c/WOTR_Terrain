@@ -8,7 +8,7 @@ Shader "Lux URP/FX/Lightbeam"
         [HeaderHelpLuxURP_URL(m12h3vad3enc)]
         
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CompareFunction)]
         _ZTest                                      ("ZTest", Int) = 4
         [Enum(UnityEngine.Rendering.CullMode)]
@@ -17,7 +17,7 @@ Shader "Lux URP/FX/Lightbeam"
         _OrthoSpport                                ("Enable Orthographic Support", Float) = 0
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [HDR] _Color                                ("Color", Color) = (1,1,1,1)
         [NoScaleOffset] _MainTex                    ("Fall Off (G)", 2D) = "white" {}
         [NoScaleOffset] _SpotTex                    ("Spot Mask (G)", 2D) = "white" {}
@@ -26,7 +26,7 @@ Shader "Lux URP/FX/Lightbeam"
         _SpotFade                                   ("Spot Mask Intensity", Range(0.51, 1.0)) = 0.6     // 0.6 from UDK
 
         [Header(Detail Noise)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_MASKMAP)]
         _SpecGlossEnabled                           ("Enable detail noise", Float) = 0
         _DetailTex                                  ("     Detail Noise (G)", 2D) = "white" {}
@@ -35,12 +35,12 @@ Shader "Lux URP/FX/Lightbeam"
 
 
         [Header(Scene Fade)]
-        [Space(5)]
+        [Space(8)]
         _near                                       ("     Near", Float) = 0.0
         _far                                        ("     Soft Edge Factor", Float) = 2.0
 
         [Header(Camera Fade)]
-        [Space(5)]
+        [Space(8)]
         [LuxURPCameraFadeDrawer]
         _CameraFadeDistances                        ("Camera Fade Distances", Vector) = (0.3,1,0.3,1) // !!! x + y are used, z + w are displayed
 
@@ -278,17 +278,11 @@ Shader "Lux URP/FX/Lightbeam"
 
             //  Surface fade
                 float fade = saturate (_far * ((sceneZ - _near) - thisZ));
-
-//  Poor man's anti aliasing in case we only rely on the depth sample (Ztest = Always): Adjust fade according to change in depth
-float change = fwidth(fade);
-//fade = lerp(fade, 0, (saturate(change)) * .5);
-
             //  Camera fade
                 fade *= saturate( (thisZ - _CameraFadeDistances.x) * _CameraFadeDistances.y);
             //  Combine
                 col.a *= mask01 * mask02 * fade * input.distFade;
                 col.rgb = MixFog(_Color.rgb, input.fogCoord);
-
                 return half4(col);
             }
             ENDHLSL

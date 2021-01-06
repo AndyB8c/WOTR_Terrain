@@ -1,0 +1,230 @@
+Using pre-set license
+Built from '2020.2/staging' branch; Version is '2020.2.0b14 (dc0b50340a64) revision 14420816'; Using compiler version '192528614'; Build Type 'Release'
+OS: 'Windows 10  (10.0.0) 64bit' Language: 'en' Physical Memory: 32529 MB
+BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, IsPro: 0
+
+ COMMAND LINE ARGUMENTS:
+C:\Program Files\Unity\Hub\Editor\2020.2.0b14\Editor\Unity.exe
+-adb2
+-batchMode
+-noUpm
+-name
+AssetImportWorker0
+-projectPath
+H:/UnityProjects/WOTR_Terrain
+-logFile
+Logs/AssetImportWorker0.log
+-srvPort
+59290
+Successfully changed project path to: H:/UnityProjects/WOTR_Terrain
+H:/UnityProjects/WOTR_Terrain
+Using Asset Import Pipeline V2.
+Refreshing native plugins compatible for Editor in 122.06 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 2020.2.0b14 (dc0b50340a64)
+[Subsystems] Discovering subsystems at path C:/Program Files/Unity/Hub/Editor/2020.2.0b14/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path H:/UnityProjects/WOTR_Terrain/Assets
+GfxDevice: creating device client; threaded=0
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.1]
+    Renderer: NVIDIA Quadro M4000 (ID=0x13f1)
+    Vendor:   
+    VRAM:     8144 MB
+    Driver:   26.21.14.4097
+Shader 'Universal Render Pipeline/Particles/Lit': fallback shader 'Universal Render Pipeline/Particles/SimpleLit' not found
+Initialize mono
+Mono path[0] = 'C:/Program Files/Unity/Hub/Editor/2020.2.0b14/Editor/Data/Managed'
+Mono path[1] = 'C:/Program Files/Unity/Hub/Editor/2020.2.0b14/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = 'C:/Program Files/Unity/Hub/Editor/2020.2.0b14/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56760
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.2.0b14/Editor/Data/PlaybackEngines/WebGLSupport/UnityEditor.WebGL.Extensions.dll
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.2.0b14/Editor/Data/PlaybackEngines/WindowsStandaloneSupport/UnityEditor.WindowsStandalone.Extensions.dll
+Register platform support module: C:/Program Files/Unity/Hub/Editor/2020.2.0b14/Editor/Data/PlaybackEngines/LuminSupport/UnityEditor.Lumin.Extensions.dll
+Registered in 0.003834 seconds.
+Native extension for Lumin target not found
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+Refreshing native plugins compatible for Editor in 112.97 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  2.203 seconds
+Platform modules already initialized, skipping
+Registering precompiled user dll's ...
+Registered in 0.004627 seconds.
+Begin MonoManager ReloadAssembly
+Error: Could not load signature of Unity.UNetWeaver.Helpers:GetSymbolReaderProvider due to: Could not load file or assembly 'Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e' or one of its dependencies. assembly:Mono.Cecil, Version=0.10.0.0, Culture=neutral, PublicKeyToken=50cebf1cceb9d05e type:<unknown type> member:(null) signature:<none>
+
+Error: Could not load signature of DG.Tweening.DOTweenModuleAudio:DOFade due to: Could not load file or assembly 'DOTween, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' or one of its dependencies. assembly:DOTween, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null type:<unknown type> member:(null) signature:<none>
+
+Unloading broken assembly Library/ScriptAssemblies/Unity.RenderPipelines.Core.Editor.dll, this assembly can cause crashes in the runtime
+
+Unloading broken assembly Library/ScriptAssemblies/com.unity.multiplayer-weaver.Editor.dll, this assembly can cause crashes in the runtime
+
+Unloading broken assembly Library/ScriptAssemblies/Assembly-CSharp.dll, this assembly can cause crashes in the runtime
+
+Native extension for Lumin target not found
+Native extension for WindowsStandalone target not found
+Native extension for WebGL target not found
+Refreshing native plugins compatible for Editor in 121.16 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+NoiseLib::GatherNoiseTypes: Failed to get types from assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GatherNoiseTypes () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:306)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GenerateHeaderFiles () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:577)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:.cctor () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:40)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor (System.RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes (System.Type[])
+
+(Filename: Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs Line: 306)
+
+NoiseLib::GatherNoiseTypes: Failed to get types from assembly: com.unity.multiplayer-weaver.Editor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GatherNoiseTypes () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:306)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GenerateHeaderFiles () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:577)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:.cctor () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:40)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor (System.RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes (System.Type[])
+
+(Filename: Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs Line: 306)
+
+NoiseLib::GatherNoiseTypes: Failed to get types from assembly: Unity.RenderPipelines.Core.Editor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GatherNoiseTypes () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:306)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GenerateHeaderFiles () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:577)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:.cctor () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:40)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor (System.RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes (System.Type[])
+
+(Filename: Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs Line: 306)
+
+NoiseLib::GatherFractalTypes: Failed to get types from assembly: Assembly-CSharp, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GatherFractalTypes () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:355)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GenerateHeaderFiles () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:578)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:.cctor () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:40)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor (System.RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes (System.Type[])
+
+(Filename: Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs Line: 355)
+
+NoiseLib::GatherFractalTypes: Failed to get types from assembly: com.unity.multiplayer-weaver.Editor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GatherFractalTypes () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:355)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GenerateHeaderFiles () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:578)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:.cctor () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:40)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor (System.RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes (System.Type[])
+
+(Filename: Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs Line: 355)
+
+NoiseLib::GatherFractalTypes: Failed to get types from assembly: Unity.RenderPipelines.Core.Editor, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:Log (object)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GatherFractalTypes () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:355)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:GenerateHeaderFiles () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:578)
+UnityEditor.Experimental.TerrainAPI.NoiseLib:.cctor () (at Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs:40)
+System.Runtime.CompilerServices.RuntimeHelpers:RunClassConstructor (System.RuntimeTypeHandle)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes (System.Type[])
+
+(Filename: Library/PackageCache/com.unity.terrain-tools@3.0.2-preview.3/Editor/TerrainTools/NoiseLib/API/NoiseLib.cs Line: 355)
+
+System.IO.FileNotFoundException: Could not load file or assembly 'Unity.Analytics.Editor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null' or one of its dependencies.
+File name: 'Unity.Analytics.Editor, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null'
+UnityEngine.StackTraceUtility:ExtractStackTrace ()
+UnityEngine.DebugLogHandler:LogFormat (UnityEngine.LogType,UnityEngine.Object,string,object[])
+UnityEngine.Logger:Log (UnityEngine.LogType,object)
+UnityEngine.Debug:LogError (object)
+UnityEditor.EditorAssemblies:ProcessInitializeOnLoadAttributes (System.Type[])
+
+Invoked RoslynAnalysisRunner static constructor.
+RoslynAnalysisRunner will not be running.
+RoslynAnalysisRunner has terminated.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.412 seconds
+Platform modules already initialized, skipping
+========================================================================
+Worker process is ready to serve import requests
+Shader 'Lux URP/Particles/Simple Lit': fallback shader 'Lightweight Render Pipeline/Particles/Unlit' not found
+Shader 'Lux URP/Particles/Simple Lit': fallback shader 'Lightweight Render Pipeline/Particles/Unlit' not found
+Shader 'Universal Render Pipeline/Particles/Lit': fallback shader 'Universal Render Pipeline/Particles/SimpleLit' not found
+Shader 'Lux URP/Particles/Simple Lit': fallback shader 'Lightweight Render Pipeline/Particles/Unlit' not found
+Launched and connected shader compiler UnityShaderCompiler.exe after 0.04 seconds
+Refreshing native plugins compatible for Editor in 1.73 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 3744 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 282.5 MB.
+System memory in use after: 281.4 MB.
+
+Unloading 60 unused Assets to reduce memory usage. Loaded Objects now: 4203.
+Total: 3.641600 ms (FindLiveObjects: 0.346500 ms CreateObjectMapping: 0.168800 ms MarkObjects: 2.070000 ms  DeleteObjects: 1.055400 ms)
+
+========================================================================
+Received Import Request.
+  path: Assets/Lux URP Essentials/Readme.txt
+  artifactKey: Guid(cacf6b23dbc0753418b91f45f7b4335b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Lux URP Essentials/Readme.txt using Guid(cacf6b23dbc0753418b91f45f7b4335b) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0246a9eb94144eaee8faddf3131bbbb6') in 0.044656 seconds
+  Import took 0.051462 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 174.691334 seconds.
+  path: Assets/Lux URP Essentials/Lux URP Essentials 1.61.pdf
+  artifactKey: Guid(b619babe3d9a13e46893c1e7354508c4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Lux URP Essentials/Lux URP Essentials 1.61.pdf using Guid(b619babe3d9a13e46893c1e7354508c4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'bf807c4bf98cfcf029df98fc98671860') in 0.008716 seconds
+  Import took 0.015470 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 139.778255 seconds.
+  path: Assets/Lux URP Essentials/Demos
+  artifactKey: Guid(2a2915a431b0c4fdea80a4dd99d8c8ac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Lux URP Essentials/Demos using Guid(2a2915a431b0c4fdea80a4dd99d8c8ac) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '0c9dd9103fcdb24be21da6424251aaf2') in 0.006010 seconds
+  Import took 0.012794 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 1.247782 seconds.
+  path: Assets/Lux URP Essentials/Demos/Art Assets
+  artifactKey: Guid(0a153873b40984ad7b12ce67a8654fbb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Lux URP Essentials/Demos/Art Assets using Guid(0a153873b40984ad7b12ce67a8654fbb) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e7242d66ba1543ba03844c645daacf13') in 0.006019 seconds
+  Import took 0.012636 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 4.244265 seconds.
+  path: Assets/Lux URP Essentials/Demos/Environment Demo
+  artifactKey: Guid(b8d3bea76b00b41ac8f15a88ad9fddd6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Lux URP Essentials/Demos/Environment Demo using Guid(b8d3bea76b00b41ac8f15a88ad9fddd6) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'd835fa6d954a58652aeb522e1f737850') in 0.006196 seconds
+  Import took 0.012883 seconds .
+
+========================================================================
+Received Import Request.
+  Time since last request: 15.121684 seconds.
+  path: Assets/Lux URP Essentials/Demos/Terrain Demo.unity
+  artifactKey: Guid(580ce777fadca4d0a98196270054ab99) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Lux URP Essentials/Demos/Terrain Demo.unity using Guid(580ce777fadca4d0a98196270054ab99) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6d2f1487e519f3d126b2af382ce3edfd') in 0.006973 seconds
+  Import took 0.013995 seconds .
+
+AssetImportWorkerClient::OnTransportError - code=2 error=End of file

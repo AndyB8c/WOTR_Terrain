@@ -7,18 +7,18 @@ public class LuxURPCustomSingleSidedShaderGUI : ShaderGUI
     {
         base.OnGUI(materialEditor, properties);
 
-        Material material = materialEditor.target as Material;
+    	Material material = materialEditor.target as Material;
 
     //  Old signature
-        if (material.HasProperty("_Culling")) {
-            var _Culling = ShaderGUI.FindProperty("_Culling", properties);
-            if(_Culling.floatValue == 0.0f) {
-                if (material.doubleSidedGI == false) {
-                    Debug.Log ("Double Sided Global Illumination enabled.");
-                }
-                material.doubleSidedGI = true;
-            }
-        }
+    	if (material.HasProperty("_Culling")) {
+	    	var _Culling = ShaderGUI.FindProperty("_Culling", properties);
+			if(_Culling.floatValue == 0.0f) {
+				if (material.doubleSidedGI == false) {
+					Debug.Log ("Double Sided Global Illumination enabled.");
+				}
+        		material.doubleSidedGI = true;
+        	}
+	    }
     //  Handle both cases
         if (material.HasProperty("_Cull")) {
             var _Cull = ShaderGUI.FindProperty("_Cull", properties);

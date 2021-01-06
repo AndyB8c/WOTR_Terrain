@@ -62,10 +62,12 @@
     {
         float3 positionOS                   : POSITION;
         float3 normalOS                     : NORMAL;
-        float4 tangentOS                    : TANGENT;
+        #if !defined(UNITY_PASS_SHADOWCASTER) && !defined(DEPTHONLYPASS) && !defined(DEPTHNORMALPASS)
+            float4 tangentOS                : TANGENT;
+            float2 lightmapUV               : TEXCOORD1;
+        #endif
         float2 texcoord                     : TEXCOORD0;
-        float2 lightmapUV                   : TEXCOORD1;
-        half4 color                         : COLOR;
+        //half4 color                       : COLOR;
         UNITY_VERTEX_INPUT_INSTANCE_ID
     };
     
@@ -79,11 +81,14 @@
         #endif
 
         #if !defined(UNITY_PASS_SHADOWCASTER) && !defined(DEPTHONLYPASS)
+            float3 normalWS                 : TEXCOORD3;
+        #endif
+
+        #if !defined(UNITY_PASS_SHADOWCASTER) && !defined(DEPTHONLYPASS)
             DECLARE_LIGHTMAP_OR_SH(lightmapUV, vertexSH, 1);
             #if defined(REQUIRES_WORLD_SPACE_POS_INTERPOLATOR)
                 float3 positionWS           : TEXCOORD2;
             #endif
-            float3 normalWS                 : TEXCOORD3;
             float3 viewDirWS                : TEXCOORD4;
             #if defined(_NORMALMAP) || !defined(_COTTONWOOL)
                 float4 tangentWS            : TEXCOORD5;

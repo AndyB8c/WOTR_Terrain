@@ -177,15 +177,40 @@ void Lighting_half(
     float NdotV = dot(normalWS, viewDirectionWS);
     addData.sheenColor = sheenColor;
 
+    float4 clipPos = TransformWorldToHClip(positionWS);
 //  Get Shadow Sampling Coords / Unfortunately per pixel...
     #if SHADOWS_SCREEN
-        float4 clipPos = TransformWorldToHClip(positionWS);
         float4 shadowCoord = ComputeScreenPos(clipPos);
     #else
         float4 shadowCoord = TransformWorldToShadowCoord(positionWS);
     #endif
 
-    Light mainLight = GetMainLight(shadowCoord);
+//  Shadow mask 
+    #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+        half4 shadowMask = SAMPLE_SHADOWMASK(lightMapUV);
+    #elif !defined (LIGHTMAP_ON)
+        half4 shadowMask = unity_ProbesOcclusion;
+    #else
+        half4 shadowMask = half4(1, 1, 1, 1);
+    #endif
+
+    //Light mainLight = GetMainLight(shadowCoord);
+    Light mainLight = GetMainLight(shadowCoord, positionWS, shadowMask);
+    half3 mainLightColor = mainLight.color;
+//  SSAO
+    #if defined(_SCREEN_SPACE_OCCLUSION)
+        float4 ndc = clipPos * 0.5f;
+        float2 normalized = float2(ndc.x, ndc.y * _ProjectionParams.x) + ndc.w;
+        normalized /= clipPos.w;
+        normalized *= _ScreenParams.xy;
+    //  We could also use IN.Screenpos(default) --> ( IN.Screenpos.xy * _ScreenParams.xy)
+    //  HDRP 10.1
+        normalized = GetNormalizedScreenSpaceUV(normalized);
+        AmbientOcclusionFactor aoFactor = GetScreenSpaceAmbientOcclusion(normalized);
+        mainLight.color *= aoFactor.directAmbientOcclusion;
+        occlusion = min(occlusion, aoFactor.indirectAmbientOcclusion);
+    #endif
+
     MixRealtimeAndBakedGI(mainLight, normalWS, bakedGI, half4(0, 0, 0, 0));
 
 //  GI
@@ -199,14 +224,20 @@ void Lighting_half(
         half3 transLightDir = mainLight.direction + normalWS * transmissionDistortion;
         half transDot = dot( transLightDir, -viewDirectionWS );
         transDot = exp2(saturate(transDot) * transmissionPower - transmissionPower);
-        FinalLighting += brdfData.diffuse * transDot * (1.0h - NdotL) * mainLight.color * lerp(1.0h, mainLight.shadowAttenuation, transmissionShadowstrength) * transmissionStrength * 4;
+        FinalLighting += brdfData.diffuse * transDot * (1.0h - NdotL) * mainLightColor * lerp(1.0h, mainLight.shadowAttenuation, transmissionShadowstrength) * transmissionStrength * 4;
     }
 
 //  Handle additional lights
     #ifdef _ADDITIONAL_LIGHTS
         uint pixelLightCount = GetAdditionalLightsCount();
         for (uint i = 0u; i < pixelLightCount; ++i) {
-            Light light = GetAdditionalLight(i, positionWS);
+            // Light light = GetAdditionalPerObjectLight(index, positionWS); // here; shadowAttenuation = 1.0;
+        //  URP 10: We have to use the new GetAdditionalLight function
+            Light light = GetAdditionalLight(i, positionWS, shadowMask);
+            half3 lightColor = light.color;
+            #if defined(_SCREEN_SPACE_OCCLUSION)
+                light.color *= aoFactor.directAmbientOcclusion;
+            #endif
             NdotL = saturate(dot(normalWS, light.direction ));
             FinalLighting += LightingPhysicallyBased_LuxCharlieSheen(brdfData, addData, light, normalWS, viewDirectionWS, NdotL);
         //  transmission
@@ -215,7 +246,7 @@ void Lighting_half(
                 half transDot = dot( transLightDir, -viewDirectionWS );
                 transDot = exp2(saturate(transDot) * transmissionPower - transmissionPower);
                 NdotL = saturate(dot(normalWS, light.direction));
-                FinalLighting += brdfData.diffuse * transDot * (1.0h - NdotL) * light.color * lerp(1.0h, light.shadowAttenuation, transmissionShadowstrength) * light.distanceAttenuation * transmissionStrength * 4;
+                FinalLighting += brdfData.diffuse * transDot * (1.0h - NdotL) * lightColor * lerp(1.0h, light.shadowAttenuation, transmissionShadowstrength) * light.distanceAttenuation * transmissionStrength * 4;
             }
         }
     #endif

@@ -17,26 +17,22 @@
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
     #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
 
+// NOTE: Do not ifdef the properties here as SRP batcher can not handle different layouts.
 //  Material Inputs
     CBUFFER_START(UnityPerMaterial)
-
+        float4  _BaseMap_ST;
+        
         half4   _BaseColor;
+        half3   _SpecColor;
         half    _Smoothness;
         half    _Metallic;
-        half3   _SpecColor;
-
         half    _Cutoff;
 
         half    _ShadowOffset;
 
-    //  Needed by LitMetaPass
-        float4  _BaseMap_ST;
-        
         float4  _BumpMap_ST;
         half    _BumpScale;
         float4  _MaskMap_ST;
-
-        half    _Occlusion;
 
         half    _TranslucencyPower;
         half    _TranslucencyStrength;
@@ -51,6 +47,8 @@
         half    _RimMinPower;
         half    _RimFrequency;
         half    _RimPerPositionFrequency;
+
+        half    _Occlusion;
             
     CBUFFER_END
 

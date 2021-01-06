@@ -10,7 +10,7 @@ Shader "Lux URP/Cloth"
         [HeaderHelpLuxURP_URL(kg40d8bgwewa)]
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CullMode)]
         _Cull                       ("Culling", Float) = 2
         [Toggle(_ALPHATEST_ON)]
@@ -24,7 +24,7 @@ Shader "Lux URP/Cloth"
 
 
         [Header(Charlie Sheen Lighting)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_COTTONWOOL)]
         _UseCottonWool              ("Enable Charlie Sheen Lighting", Float) = 0.0
         //[NoScaleOffset]
@@ -33,11 +33,11 @@ Shader "Lux URP/Cloth"
         _SheenColor                 ("     Sheen Color", Color) = (0.5, 0.5, 0.5)
 
         [Header(GGX anisotropic Lighting)]
-        [Space(5)]
+        [Space(8)]
         _Anisotropy                 ("     Anisotropy", Range(-1.0, 1.0)) = 0.0
 
         [Header(Transmission)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_SCATTERING)]
         _UseScattering              ("Enable Transmission", Float) = 0.0
         _TranslucencyPower          ("     Power", Range(0.0, 32.0)) = 7.0
@@ -47,7 +47,7 @@ Shader "Lux URP/Cloth"
 
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [MainColor]
         _BaseColor                  ("Color", Color) = (1,1,1,1)
         [MainTexture]
@@ -72,7 +72,7 @@ Shader "Lux URP/Cloth"
         
 
         [Header(Rim Lighting)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_RIMLIGHTING)]
         _Rim                        ("Enable Rim Lighting", Float) = 0
         [HDR] _RimColor             ("Rim Color", Color) = (0.5,0.5,0.5,1)
@@ -83,7 +83,7 @@ Shader "Lux URP/Cloth"
 
 
         [Header(Stencil)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _Stencil         ("Stencil Reference", Range (0, 255)) = 0
         [IntRange] _ReadMask        ("     Read Mask", Range (0, 255)) = 255
         [IntRange] _WriteMask       ("     Write Mask", Range (0, 255)) = 255
@@ -98,7 +98,7 @@ Shader "Lux URP/Cloth"
 
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         //[ToggleOff]
         //_SpecularHighlights       ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
@@ -109,7 +109,7 @@ Shader "Lux URP/Cloth"
 
 
         [Header(Render Queue)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _QueueOffset     ("Queue Offset", Range(-50, 50)) = 0
 
 
@@ -155,35 +155,34 @@ Shader "Lux URP/Cloth"
             // Required to compile gles 2.0 with standard SRP library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-
-        //  Shader target needs to be 3.0 due to tex2Dlod in the vertex shader and VFACE
             #pragma target 2.0
 
             // -------------------------------------
             // Material Keywords
             #define _SPECULAR_SETUP 1
 
-            #pragma shader_feature _ALPHATEST_ON
-
-            #pragma shader_feature_local _COTTONWOOL
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local _ALPHATEST_ON   // not per fragment!
             #pragma shader_feature_local _MASKMAP
-            #pragma shader_feature_local _SCATTERING
-
-            #pragma shader_feature _NORMALMAP
-            #pragma shader_feature_local _RIMLIGHTING
+            
+            #pragma shader_feature_local_fragment _COTTONWOOL
+            #pragma shader_feature_local_fragment _SCATTERING
+            #pragma shader_feature_local_fragment _RIMLIGHTING
 
             //#pragma shader_feature _SPECULARHIGHLIGHTS_OFF // does not make sense here
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -194,6 +193,7 @@ Shader "Lux URP/Cloth"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
         //  Include base inputs and all other needed "base" includes
             #include "Includes/Lux URP Cloth Inputs.hlsl"
@@ -228,6 +228,7 @@ Shader "Lux URP/Cloth"
                 // already normalized from normal transform to WS.
                 output.normalWS = normalInput.normalWS;
                 output.viewDirWS = viewDirWS;
+            //  GGX needs the tangent even if no normal is assigned!
                 #if defined(_NORMALMAP) || !defined(_COTTONWOOL)
                     float sign = input.tangentOS.w * GetOddNegativeScale();
                     output.tangentWS = float4(normalInput.tangentWS.xyz, sign);
@@ -298,6 +299,7 @@ Shader "Lux URP/Cloth"
             void InitializeInputData(VertexOutput input, half3 normalTS, half facing, out InputData inputData)
             {
                 inputData = (InputData)0;
+                
                 #if defined(REQUIRES_WORLD_SPACE_POS_INTERPOLATOR)
                     inputData.positionWS = input.positionWS;
                 #endif
@@ -326,6 +328,11 @@ Shader "Lux URP/Cloth"
                 inputData.fogCoord = input.fogFactorAndVertexLight.x;
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+
+                //inputData.normalizedScreenSpaceUV = input.positionCS.xy;
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
+
             }
 
             half4 LitPassFragment(VertexOutput input, half facing : VFACE) : SV_Target
@@ -351,6 +358,11 @@ Shader "Lux URP/Cloth"
                     surfaceData.emission += pow(rim, power) * _RimColor.rgb * _RimColor.a;
                 #endif
 
+                #if !defined(_COTTONWOOL)
+                    float sgn = input.tangentWS.w;      // should be either +1 or -1
+                    float3 bitangent = sgn * cross(input.normalWS.xyz, input.tangentWS.xyz);
+                #endif
+
             //  Apply lighting
                 half4 color = LuxURPClothFragmentPBR(
                     inputData, 
@@ -374,7 +386,6 @@ Shader "Lux URP/Cloth"
                         half4(0,0,0,0)
                     #endif
                 );    
-            
             //  Add fog
                 color.rgb = MixFog(color.rgb, inputData.fogCoord);
                 return color;
@@ -393,7 +404,8 @@ Shader "Lux URP/Cloth"
 
             ZWrite On
             ZTest LEqual
-            Cull Off
+            ColorMask 0
+            Cull[_Cull]
 
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard srp library
@@ -403,13 +415,14 @@ Shader "Lux URP/Cloth"
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
+            #pragma shader_feature_local _ALPHATEST_ON      // not per fragment!
             #pragma shader_feature_local _MASKMAP
 
 
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
@@ -480,12 +493,13 @@ Shader "Lux URP/Cloth"
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
+            #pragma shader_feature_local _ALPHATEST_ON        // not per fragment!
             #pragma shader_feature_local _MASKMAP
 
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
             
             #define DEPTHONLYPASS
             #include "Includes/Lux URP Cloth Inputs.hlsl"
@@ -518,6 +532,72 @@ Shader "Lux URP/Cloth"
                 return 0;
             }
 
+            ENDHLSL
+        }
+
+    //  Depth Normal ---------------------------------------------
+        // This pass is used when drawing to a _CameraNormalsTexture texture
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalVertex
+            #pragma fragment DepthNormalFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local _ALPHATEST_ON      // not per fragment!
+            #pragma shader_feature_local _MASKMAP
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+            
+            #define DEPTHNORMALPASS
+            #include "Includes/Lux URP Cloth Inputs.hlsl"
+
+            VertexOutput DepthNormalVertex(VertexInput input)
+            {
+                VertexOutput output = (VertexOutput)0;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+
+                #if defined(_ALPHATEST_ON) && defined(_MASKMAP)
+                    output.uv.xy = TRANSFORM_TEX(input.texcoord, _MaskMap);
+                #endif
+
+                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
+
+                VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS, float4(1,1,1,1)); //input.tangentOS);
+                output.normalWS = NormalizeNormalPerVertex(normalInput.normalWS);
+
+                return output;
+            }
+
+            half4 DepthNormalFragment(VertexOutput input) : SV_TARGET
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
+                #if defined(_ALPHATEST_ON) && defined(_MASKMAP)
+                    half mask = SAMPLE_TEXTURE2D(_MaskMap, sampler_MaskMap, input.uv.xy).a;
+                    clip (mask - _Cutoff);
+                #endif
+
+                float3 normal = input.normalWS;
+                return float4(PackNormalOctRectEncode(TransformWorldToViewDir(normal, true)), 0.0, 0.0);
+
+            }
             ENDHLSL
         }
 
@@ -555,6 +635,9 @@ Shader "Lux URP/Cloth"
                 outSurfaceData.normalTS = half3(0,0,1);
                 outSurfaceData.occlusion = 1;
                 outSurfaceData.emission = 0;
+
+                outSurfaceData.clearCoatMask = 0;
+                outSurfaceData.clearCoatSmoothness = 0;
             }
 
         //  Finally include the meta pass related stuff  

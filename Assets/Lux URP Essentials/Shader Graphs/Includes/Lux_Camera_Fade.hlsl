@@ -5,23 +5,31 @@ float Dither32(float2 Pos) {
 
 void CameraFade_float(
 //  Base inputs
-    float4 positionSP,
+    float4 positionSS,
     float3 positionWS,
     float  CameraInversFadeRange,
     float  CameraFadeDist,
-    float  AlphaIN,
+    half  AlphaIN,
 
-    out real Alpha
+    out half Alpha
 
 ) {
-	#if !defined(SHADERPASS_SHADOWCASTER)
-    	Alpha = AlphaIN * saturate( (positionSP.w - CameraFadeDist) * CameraInversFadeRange - Dither32(positionSP.xy / positionSP.w * _ScreenParams.xy ) );
+	
+    float dither = Dither32(positionSS.xy / positionSS.w * _ScreenParams.xy );
+//  URP 10.1: We have to somehow identify the shadowcaster pass.
+//  float4x4 projection = GetViewToHClipMatrix(); //UNITY_MATRIX_P;
+//  projection._m11 = -1 * projection._m00!
+//  We use a little threshold here
+    //if( (projection._m00 + projection._m11) < 0.001 )  {
+//  URP 10.2
+    #if (SHADERPASS == SHADERPASS_SHADOWCASTER)
+        #if defined(FADESHADOWS_ON)
+            float distanceToCam = distance(positionWS, GetCameraPositionWS() );
+            Alpha = AlphaIN * saturate( (distanceToCam - CameraFadeDist) * CameraInversFadeRange - dither );
+        #else
+            Alpha = AlphaIN;
+        #endif
     #else
-    	#if defined(FADESHADOWS_ON)
-    		float distanceToCam = distance(positionWS, GetCameraPositionWS() );
-    		Alpha = AlphaIN * saturate( (distanceToCam - CameraFadeDist) * CameraInversFadeRange - Dither32(positionSP.xy / positionSP.w * _ScreenParams.xy ) );
-    	#else
-    		Alpha = AlphaIN;
-    	#endif
+        Alpha = AlphaIN * saturate( (positionSS.w - CameraFadeDist) * CameraInversFadeRange - dither );
     #endif
 }

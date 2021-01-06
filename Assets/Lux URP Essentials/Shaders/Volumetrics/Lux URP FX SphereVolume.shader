@@ -5,7 +5,7 @@ Shader "Lux URP/FX/Sphere Volume"
 		[HeaderHelpLuxURP_URL(t98mzd66fi0m)]
 
 		[Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CompareFunction)]
         _ZTest                      ("ZTest", Int) = 8
         [Enum(UnityEngine.Rendering.CullMode)]
@@ -14,7 +14,7 @@ Shader "Lux URP/FX/Sphere Volume"
         _OrthoSpport                ("Enable Orthographic Support", Float) = 0
 
 		[Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
 		_Color 						("Color", Color) = (1, 1, 1, 1)
 
 		[Toggle(_ENABLEGRADIENT)]
@@ -23,13 +23,13 @@ Shader "Lux URP/FX/Sphere Volume"
 		_MainTex 					("     Thickness Gradient", 2D) = "white" {}
 
 		[Header(Thickness Remap)]
-        [Space(5)]
+        [Space(8)]
         _Lower                      ("     Lower", Range(0,1)) = 0
         _Upper                      ("     Upper", Range(0,4)) = 1
         //[Space(5)]
 		//_SoftEdge                   ("     Soft Edge Factor", Float) = 2.0
 
-		[Space(10)]
+		[Space(5)]
 		[Toggle(_APPLYFOG)]
 		_ApplyFog 					("Enable Fog", Float) = 0.0
 		[Toggle(_HQFOG)]

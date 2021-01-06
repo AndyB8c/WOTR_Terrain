@@ -10,7 +10,7 @@ Shader "Lux URP/Human/Hair Blend"
         [HeaderHelpLuxURP_URL(7a3r84ualf3h)]
         
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CullMode)]
         _Cull                       ("Culling", Float) = 0
         [Toggle(_ENABLEVFACE)]
@@ -24,7 +24,7 @@ Shader "Lux URP/Human/Hair Blend"
         //_Dither                   ("Blue Noise (A)", 2D) = "black" {}
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [MainColor]
         _BaseColor                  ("Base Color", Color) = (1,1,1,1)
         _SecondaryColor             ("Secondary Color", Color) = (1,1,1,1)
@@ -50,7 +50,7 @@ Shader "Lux URP/Human/Hair Blend"
 
         
         [Header(Hair Lighting)]
-        [Space(5)]
+        [Space(8)]
         [KeywordEnum(Bitangent,Tangent)]
         _StrandDir                  ("Strand Direction", Float) = 0
 
@@ -73,7 +73,7 @@ Shader "Lux URP/Human/Hair Blend"
 
 
         [Header(Rim Lighting)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_RIMLIGHTING)]
         _Rim                        ("Enable Rim Lighting", Float) = 0
         [HDR] _RimColor             ("Rim Color", Color) = (0.5,0.5,0.5,1)
@@ -84,7 +84,7 @@ Shader "Lux URP/Human/Hair Blend"
 
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         //[ToggleOff]
         //_SpecularHighlights       ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
@@ -95,7 +95,7 @@ Shader "Lux URP/Human/Hair Blend"
 
 
         [Header(Stencil)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _Stencil         ("Stencil Reference", Range (0, 255)) = 0
         [IntRange] _ReadMask        ("     Read Mask", Range (0, 255)) = 255
         [IntRange] _WriteMask       ("     Write Mask", Range (0, 255)) = 255
@@ -114,6 +114,9 @@ Shader "Lux URP/Human/Hair Blend"
     //  Lightmapper and outline selection shader need _MainTex, _Color and _Cutoff
         [HideInInspector] _MainTex  ("Albedo", 2D) = "white" {}
         [HideInInspector] _Color    ("Color", Color) = (1,1,1,1)
+
+    //  URP 10.1. needs this for the depthnormal pass 
+        [HideInInspector] _Surface("__surface", Float) = 0.0
         
     }
 
@@ -161,26 +164,27 @@ Shader "Lux URP/Human/Hair Blend"
 
             #pragma shader_feature_local _ENABLEVFACE
 
-            #pragma shader_feature_local _STRANDDIR_BITANGENT
-            #pragma shader_feature_local _MASKMAP
-            #pragma shader_feature_local _SECONDARYLOBE
+            #pragma shader_feature_local_fragment _STRANDDIR_BITANGENT
+            #pragma shader_feature_local_fragment _MASKMAP
+            #pragma shader_feature_local_fragment _SECONDARYLOBE
 
             #pragma shader_feature _NORMALMAP
-            #pragma shader_feature_local _RIMLIGHTING
+            #pragma shader_feature_local_fragment _RIMLIGHTING
 
             //#pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-//  We know we are transparent. So no cascades
-//          #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
+            #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -191,6 +195,7 @@ Shader "Lux URP/Human/Hair Blend"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
         //  Include base inputs and all other needed "base" includes
             #include "Includes/Lux URP Hair Inputs.hlsl"
@@ -236,6 +241,9 @@ Shader "Lux URP/Human/Hair Blend"
                 outSurfaceData.normalTS = half3(0,0,1);
                 outSurfaceData.occlusion = 1;
                 outSurfaceData.emission = 0;
+
+                outSurfaceData.clearCoatMask = 0;
+                outSurfaceData.clearCoatSmoothness = 0;
             }
 
         //  Finally include the meta pass related stuff  

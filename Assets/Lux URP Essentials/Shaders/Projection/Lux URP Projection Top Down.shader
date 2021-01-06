@@ -7,14 +7,15 @@ Shader "Lux URP/Projection/Top Down"
         [HeaderHelpLuxURP_URL(80kxmwjj8akf)]
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff(_RECEIVE_SHADOWS_OFF)]
         _ReceiveShadows                 ("Receive Shadows", Float) = 1.0
 
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         _BaseMap                        ("Albedo (RGB) Smoothness (A)", 2D) = "white" {}
+        [MainColor] _BaseColor          ("Base Color", Color) = (1,1,1,1)
         [Toggle(_DYNSCALE)]
         _ApplyDynScale                  ("Enable dynamic tiling", Float) = 0.0
         
@@ -29,7 +30,7 @@ Shader "Lux URP/Projection/Top Down"
         _BumpScale                      ("     Normal Scale", Float) = 1.0
         
         [Header(Mask Map)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_COMBINEDTEXTURE)]
         _CombinedTexture                ("Enable Mask Map", Float) = 0.0
         [NoScaleOffset] _MaskMap        ("     Metallness (R) Occlusion (G) Height (B) Emission (A) ", 2D) = "bump" {}
@@ -40,7 +41,7 @@ Shader "Lux URP/Projection/Top Down"
         _Occlusion                      ("     Occlusion", Range(0.0, 1.0)) = 1.0
         
         [Header(Top Down Projection)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_TOPDOWNPROJECTION)]
         _ApplyTopDownProjection         ("Enable top down Projection", Float) = 1.0
         [NoScaleOffset]_TopDownBaseMap  ("     Albedo (RGB) Smoothness (A)", 2D) = "white" {}
@@ -56,7 +57,7 @@ Shader "Lux URP/Projection/Top Down"
         _TerrainPosition                ("     Terrain Position (XYZ)", Vector) = (0,0,0,0)
 
         [Header(Blending)]
-        [Space(5)]
+        [Space(8)]
         _NormalLimit                    ("Angle Limit", Range(0.05,1)) = 0.5
         _NormalFactor                   ("Strength", Range(0.0,2)) = 1
         [Space(5)]
@@ -66,7 +67,7 @@ Shader "Lux URP/Projection/Top Down"
         _HeightBlendSharpness           ("Height Influence", Range(0.0, 1.0)) = 1.0
 
         [Header(Fuzz Lighting)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_SIMPLEFUZZ)]
         _EnableFuzzyLighting            ("Enable Fuzzy Lighting", Float) = 0
         _FuzzWrap                       ("     Diffuse Wrap", Range(0, 1)) = 0.5 
@@ -76,11 +77,14 @@ Shader "Lux URP/Projection/Top Down"
         _FuzzAmbient                    ("     Ambient Strength", Range(0, 1)) = 1 
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff]
         _SpecularHighlights             ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
         _EnvironmentReflections         ("Environment Reflections", Float) = 1.0
+
+        // DepthNormal compatibility
+        [HideInInspector] _Cutoff("Alpha Cutoff", Range(0.0, 1.0)) = 0
     }
 
     SubShader
@@ -111,32 +115,30 @@ Shader "Lux URP/Projection/Top Down"
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _NORMALMAP
+            #pragma shader_feature_local _NORMALMAP
             #define _SPECULAR_SETUP 1
 
             #pragma shader_feature_local _TOPDOWNPROJECTION
             #pragma shader_feature_local _DYNSCALE
-            #pragma shader_feature_local _COMBINEDTEXTURE
-            #pragma shader_feature_local _MASKFROMNORMAL
+            #pragma shader_feature_local_fragment _COMBINEDTEXTURE
+            #pragma shader_feature_local_fragment _MASKFROMNORMAL
 
-            #pragma shader_feature_local _SIMPLEFUZZ
+            #pragma shader_feature_local_fragment _SIMPLEFUZZ
 
-            // #pragma shader_feature _EMISSION
-            #pragma multi_compile _ LOD_FADE_CROSSFADE
-
-
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -147,18 +149,9 @@ Shader "Lux URP/Projection/Top Down"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
-        //  defines a bunch of helper functions (like lerpwhiteto)
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/CommonMaterial.hlsl"
-        //  defines SurfaceData, textures and the functions Alpha, SampleAlbedoAlpha, SampleNormal, SampleEmission
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/SurfaceInput.hlsl"
-
-            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
-            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/UnityInstancing.hlsl"
-
-            #include "../Includes/Lux URP Simple Fuzz Lighting.hlsl"
+            #pragma multi_compile _ LOD_FADE_CROSSFADE
 
             #include "Includes/Top Down URP Inputs.hlsl"
 
@@ -199,6 +192,9 @@ Shader "Lux URP/Projection/Top Down"
                 inputData.fogCoord = input.fogFactorAndVertexLight.x;
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
             }
 
 			VertexOutput LitPassVertex(VertexInput input)
@@ -223,9 +219,8 @@ Shader "Lux URP/Projection/Top Down"
                     output.uv.xy *= scale;
                 #endif
 
-                // already normalized from normal transform to WS.
+            //  Already normalized from normal transform to WS!
                 output.normalWS = normalInput.normalWS;
-                //output.normalWS = NormalizeNormalPerVertex(normalInput.normalWS);
                 
                 #ifdef _NORMALMAP
                     float sign = input.tangentOS.w * GetOddNegativeScale();
@@ -255,7 +250,7 @@ Shader "Lux URP/Projection/Top Down"
         //  Surface function which has full access to all vertex interpolators
             inline void InitializeStandardLitSurfaceData(VertexOutput input, out SurfaceDescription outSurfaceData)
             {
-                half4 albedoAlpha = SampleAlbedoAlpha(input.uv.xy, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap));
+                half4 albedoAlpha = SampleAlbedoAlpha(input.uv.xy, TEXTURE2D_ARGS(_BaseMap, sampler_BaseMap)) * _BaseColor;
                 albedoAlpha.a *= _GlossMapScale;
 
                 outSurfaceData.alpha = 1;
@@ -264,9 +259,7 @@ Shader "Lux URP/Projection/Top Down"
                 outSurfaceData.emission = 0;
                 outSurfaceData.occlusion = 1;
 
-
                 outSurfaceData.fuzzMask = 0;
-
 
                 #if defined(_SPECULAR_SETUP)
                     outSurfaceData.specular = _SpecColor;
@@ -436,6 +429,8 @@ Shader "Lux URP/Projection/Top Down"
 
             ZWrite On
             ZTest LEqual
+            ColorMask 0
+            Cull Back
 
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard srp library
@@ -450,6 +445,7 @@ Shader "Lux URP/Projection/Top Down"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
@@ -559,6 +555,44 @@ Shader "Lux URP/Projection/Top Down"
             ENDHLSL
         }
 
+//  Depth Normal ---------------------------------------------
+        // This pass is used when drawing to a _CameraNormalsTexture texture
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local _NORMALMAP
+            //#pragma shader_feature_local_fragment _ALPHATEST_ON
+            //#pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+
+            //#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+            #define DEPTHNORMALONLYPASS
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Includes/Top Down URP Inputs.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
+            ENDHLSL
+        }
+
 //  Meta -----------------------------------------------------
         Pass
         {
@@ -577,7 +611,7 @@ Shader "Lux URP/Projection/Top Down"
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _NORMALMAP
+            #pragma shader_feature_local _NORMALMAP
             #define _SPECULAR_SETUP 1
 
             #pragma shader_feature _SPECGLOSSMAP
@@ -681,6 +715,9 @@ Shader "Lux URP/Projection/Top Down"
                 outSurfaceData.smoothness = albedoAlpha.a;
 
                 outSurfaceData.normalTS = half3(0,0,1);
+
+                outSurfaceData.clearCoatMask = 0;
+                outSurfaceData.clearCoatSmoothness = 0;
             }
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl"

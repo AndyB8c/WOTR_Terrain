@@ -55,6 +55,7 @@
   <ItemGroup>
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\Modes\ModeModifier.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Scriptables\TransformListener.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Scripts\ControlDisplacerParticleSys.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\MAnimalVariables.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\States\Swim.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\LookAtCamera.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Weapons\MWeaponManager Vars.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Weapons\HolsterID.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\Reactions\MReaction.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Scripts\LayerAtributes.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\MRespawner.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\AI Brain\Tasks\MessageTask.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Scriptables\MaterialListVar.cs" />
@@ -148,6 +150,7 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Riding System\Rider\DismountBehavior.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\ReboneMesh.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Camera\MProtectCameraFromWallClip.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Scripts\LuxURP_Wind.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\Dismember.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\UseTransform.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Scriptables\GameObjectHook.cs" />
@@ -158,6 +161,7 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\UI\ValueToString.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Weapons\MBow.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\AI Brain\Decisions\WaitDecision.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Scripts\Terrain Blend\GetTerrainHeightNormalMap.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Interfaces\IWayPoint.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Interfaces\IMDamage.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\FireBreath.cs" />
@@ -203,6 +207,7 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Interfaces\IProjectile.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\Behaviours\AttackTriggerBehaviour.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\ID\ModeID.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Demo\Scripts\SmoothFollow.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\MalbersEditor.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\Modes\Mode.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Interfaces\IGravity.cs" />
@@ -223,6 +228,7 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Scriptables\BoolVarListener.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\AI Brain\Tasks\SetStanceTask.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Scriptables\IntVar.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Demos\Scripts\Outline Demo\ToggleOutlineSelection.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\UnityUtils.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\GizmoVisualizer.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Weapons\MInventory.cs" />
@@ -253,6 +259,7 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Interfaces\IScene.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\States\JumpBasic.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\AI Brain\Decisions\ArriveDecision.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Scripts\Procedural Texturing\ApplyProceduralTextureProperties.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Riding System\Mount\IKReins.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\AI Brain\Decisions\CheckStatDecision.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Damage\MDisplayTrajectory.cs" />
@@ -263,8 +270,13 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Riding System\Mount\MountAI.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Tags\AnimationTag.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\MInteract.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Demos\Scripts\Outline Demo\MouseSelect.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Scripts\LuxURP_HelpBtn.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\Reactions\SpeedReaction.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Scripts\Procedural Texturing\ProceduralTexture2D.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Behaviors\CommentB.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Demos\Scripts\CheckSettings.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Scripts\LuxURP_LayerBasedCulling.cs" />
     <Compile Include="Assets\Medieval Mega Pack\Rotator2.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\StepsManager.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\MTools.cs" />
@@ -273,6 +285,8 @@
     <Compile Include="Assets\SWS\Examples\Scripts\EventCollisionTrigger.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Attributes Drawers\CreateScriptableAssetAttribute.cs" />
     <Compile Include="Assets\Medieval Mega Pack\TextureScroll.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Demos\Scripts\AnimateSphere.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Scripts\Decals\Decal.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Camera\CameraWallStop.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Attributes Drawers\EnforceTypeAttribute.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\ID\StateID.cs" />
@@ -288,7 +302,9 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Scriptables\Vector2Var.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\AI Brain\Decisions\TaskDecision.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Cinemachine\CameraInputMapper.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Scripts\GrassDisplacementRenderFeature.cs" />
     <Compile Include="Assets\SWS\Examples\Scripts\PathInputDemo.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Scripts\DebugGrassDisplacementTex.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\TriggerEnter.cs" />
     <Compile Include="Assets\SWS\Examples\Scripts\RotationHelper.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Scriptables\ResetScriptableVars.cs" />
@@ -302,13 +318,16 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Timeline\MTimelineManager.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Interfaces\ICollectable.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\ID\MAction.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Demos\Art Assets\Volumetrics\Scripts\RotateSeeker.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Riding System\Rider\MRider.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\Modes\MAttackAligner.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Scriptables\VariableReferenceDrawer.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\Aligner.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Damage\MDamager.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Camera\FreeLookCameraState.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Demo\Scripts\RotateAndMove.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\AI Brain\Decisions\CheckStanceDecision.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Scripts\ControlDisplacer.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Weapons\IMWeapon.cs" />
     <Compile Include="Assets\SWS\Examples\Scripts\RuntimeDemo.cs" />
     <Compile Include="Assets\SWS\Extensions\DOTween\Modules\DOTweenModuleSprite.cs" />
@@ -318,9 +337,11 @@
     <Compile Include="Assets\Medieval Mega Pack\MMP 1\Demo Scenes\MakeSomeNoise.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Behaviors\SoundBehavior.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\BoneScaler.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Scripts\Decals\DecalGizmos.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\MGameSettings.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\BlinkEyes.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Camera\FreeLockCameraManager.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Scripts\Decals\DecalManager.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Stats\ModifyStat.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\AI Brain\Decisions\LookDecision.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\SlowMotion.cs" />
@@ -338,30 +359,9 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Animal Controller\AI Brain\Tasks\MoveStopTask.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Timeline\AnimatorMoveTimelineFixer.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Utilities\Aim.cs" />
+    <Compile Include="Assets\Lux URP Essentials\Demos\Scripts\ExtendedFlycam.cs" />
     <Compile Include="Assets\SWS\Scripts\Manager\BezierPathManager.cs" />
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Input\MobileJoystick.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Demo\Scripts\RotateAndMove.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Demos\Scripts\AnimateSphere.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Scripts\Decals\Decal.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Scripts\LayerAtributes.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Scripts\ControlDisplacer.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Demos\Scripts\Outline Demo\MouseSelect.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Scripts\LuxURP_HelpBtn.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Scripts\ControlDisplacerParticleSys.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Scripts\LuxURP_Wind.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Scripts\Procedural Texturing\ProceduralTexture2D.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Demos\Scripts\CheckSettings.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Demos\Scripts\Outline Demo\ToggleOutlineSelection.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Scripts\LuxURP_LayerBasedCulling.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Demos\Art Assets\Volumetrics\Scripts\RotateSeeker.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Demo\Scripts\SmoothFollow.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Scripts\Terrain Blend\GetTerrainHeightNormalMap.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Scripts\Decals\DecalGizmos.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Scripts\GrassDisplacementRenderFeature.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Scripts\DebugGrassDisplacementTex.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Scripts\Procedural Texturing\ApplyProceduralTextureProperties.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Demos\Scripts\ExtendedFlycam.cs" />
-    <Compile Include="Assets\Lux URP Essentials\Scripts\Decals\DecalManager.cs" />
   </ItemGroup>
   <ItemGroup>
      <None Include="Assets\Lux URP Essentials\Demos\Fonts\ZwriteFont.shader" />
@@ -369,6 +369,7 @@
      <None Include="Assets\Samples\Terrain Tools\0.1.0-preview\Terrain Assets\ThirdPartyNotices.txt" />
      <None Include="Assets\Lux URP Essentials\Shaders\Includes\Lux URP Skin Lighting.hlsl" />
      <None Include="Assets\Malbers Animations\Common\Shaders\Mask8Toon.shader" />
+     <None Include="Assets\Lux URP Essentials\Shaders\Transmission\Lux URP Transmission.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Outline\Lux URP Toon Outline.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Tree Creator\Includes\Lux URP Tree Creator Library.hlsl" />
      <None Include="Assets\Lux URP Essentials\ChangeLog.txt" />

@@ -8,7 +8,7 @@ Shader "Lux URP/Fast Outline AlphaTested"
         [HeaderHelpLuxURP_URL(uj834ddvqvmq)]
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CompareFunction)]
         _ZTest                      ("ZTest", Int) = 4
         [Enum(UnityEngine.Rendering.CullMode)]
@@ -23,7 +23,7 @@ Shader "Lux URP/Fast Outline AlphaTested"
         _StencilCompare             ("Stencil Comparison", Int) = 6
 
         [Header(Outline)]
-        [Space(5)]
+        [Space(8)]
         _OutlineColor               ("Color", Color) = (1,1,1,1)
         _Border                     ("Width", Float) = 3
 
@@ -32,7 +32,7 @@ Shader "Lux URP/Fast Outline AlphaTested"
         _ApplyFog                   ("Enable Fog", Float) = 0.0      
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [MainColor]
         _BaseColor                  ("Color", Color) = (1,1,1,1)
         [MainTexture]
@@ -76,15 +76,13 @@ Shader "Lux URP/Fast Outline AlphaTested"
             // Required to compile gles 2.0 with standard SRP library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-
         //  Shader target needs to be 3.0 due to tex2Dlod in the vertex shader and VFACE
             #pragma target 2.0
 
             // -------------------------------------
             // Material Keywords
             #define _ALPHATEST_ON
-            #pragma shader_feature_local _APPLYFOG
-
+            #pragma shader_feature_local_fragment _APPLYFOG
 
             // -------------------------------------
             // Unity defined keywords
@@ -93,6 +91,7 @@ Shader "Lux URP/Fast Outline AlphaTested"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
         //  Include base inputs and all other needed "base" includes
             #include "Includes/Lux URP Fast Outlines AlphaTested Inputs.hlsl"

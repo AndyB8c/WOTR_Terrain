@@ -7,7 +7,7 @@ Shader "Lux URP/Water"
         [HeaderHelpLuxURP_URL(pwa0yoxc3z5m)]
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(Off,0,On,1)]_ZWrite       ("ZWrite", Float) = 1.0
         [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest("ZTest", Float) = 4 // "LessEqual"
         // [Enum(UnityEngine.Rendering.CullMode)] _Culling ("Culling", Float) = 0
@@ -19,7 +19,7 @@ Shader "Lux URP/Water"
         _OrthoSpport                    ("Enable Orthographic Support", Float) = 0
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         _BumpMap                        ("Water Normal Map", 2D) = "bump" {}
         _BumpScale                      ("Normal Scale", Float) = 1.0
         [LuxURPVectorTwoDrawer]
@@ -41,12 +41,12 @@ Shader "Lux URP/Water"
         _ReflectionBumpScale            ("Reflection Bump Scale", Range(0.1, 1.0)) = 0.3
 
         [Header(Underwater Fog)]
-        [Space(5)]
+        [Space(8)]
         _Color                          ("Fog Color", Color) = (.2,.8,.9,1)
         _Density                        ("Density", Float) = 1.0
 
         [Header(Foam)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_FOAM)] _Foam           ("Enable Foam", Float) = 1.0
         [NoScaleOffset] _FoamMap        ("Foam Albedo (RGB) Mask (A)", 2D) = "bump" {}
         _FoamTiling                     ("Foam Tiling", Float) = 2
@@ -58,10 +58,15 @@ Shader "Lux URP/Water"
         _FoamSmoothness                 ("Foam Smoothness", Range(0.0, 1.0)) = 0.3
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff] _SpecularHighlights ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
         _EnvironmentReflections         ("Environment Reflections", Float) = 1.0
+
+    //  As URP 10.1 complains about it?!: 
+        [HideInInspector] _Alpha ("Dummy", Float) = 1
+        [HideInInspector] _FresnelPower ("Dummy", Float) = 1
+        
 
     }
     SubShader
@@ -90,21 +95,22 @@ Shader "Lux URP/Water"
             #pragma target 2.0
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
-            #pragma shader_feature_local _FOAM
-            #pragma shader_feature_local ORTHO_SUPPORT
-            #pragma shader_feature_local _REFRACTION
+            #pragma shader_feature_local_fragment _FOAM
+            #pragma shader_feature_local_fragment ORTHO_SUPPORT
+            #pragma shader_feature_local_fragment _REFRACTION
 
 // #define _ADDITIONAL_LIGHTS_VERTEX
             
@@ -117,6 +123,7 @@ Shader "Lux URP/Water"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #define _SPECULAR_SETUP 1
             #define _NORMALMAP 1
@@ -473,24 +480,26 @@ Shader "Lux URP/Water"
                 #endif
 
 
-//  Fix shadowCoord for Single Pass Stereo Rendering
-    #if defined(UNITY_SINGLE_PASS_STEREO)
-        #if SHADOWS_SCREEN
-        //  Shadows perform : UnityStereoTransformScreenSpaceTex(shadowCoord.xy) after perspective division;
-        //  We do it manually:        
-            inputData.shadowCoord.xy =  inputData.shadowCoord.xy / inputData.shadowCoord.w;
-            inputData.shadowCoord.w = 1.0f;
-        //  inputData.shadowCoord.x = screenUV.x;
-        //  Then we reset shadowCoord.w and unity_StereoScaleOffset so it does not get applied twice
-            unity_StereoScaleOffset[0] = float4(1,1,0,0);
-            unity_StereoScaleOffset[1] = float4(1,1,0,0);
-        #endif
-    #endif
+            //  Fix shadowCoord for Single Pass Stereo Rendering
+                #if defined(UNITY_SINGLE_PASS_STEREO)
+                    #if SHADOWS_SCREEN
+                    //  Shadows perform : UnityStereoTransformScreenSpaceTex(shadowCoord.xy) after perspective division;
+                    //  We do it manually:        
+                        inputData.shadowCoord.xy =  inputData.shadowCoord.xy / inputData.shadowCoord.w;
+                        inputData.shadowCoord.w = 1.0f;
+                    //  inputData.shadowCoord.x = screenUV.x;
+                    //  Then we reset shadowCoord.w and unity_StereoScaleOffset so it does not get applied twice
+                        unity_StereoScaleOffset[0] = float4(1,1,0,0);
+                        unity_StereoScaleOffset[1] = float4(1,1,0,0);
+                    #endif
+                #endif
 
 
                 inputData.fogCoord = input.fogFactorAndVertexLight.x;
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
+
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
 
             //  /////////
             //  Apply lighting
@@ -515,8 +524,20 @@ Shader "Lux URP/Water"
                 half roughness2 = roughness * roughness;
                 half normalizationTerm = roughness * 4.0h + 2.0h;
 
+            //  ShadowMask: To ensure backward compatibility we have to avoid using shadowMask input, as it is not present in older shaders
+                #if defined(SHADOWS_SHADOWMASK) && defined(LIGHTMAP_ON)
+                    half4 shadowMask = inputData.shadowMask;
+                #elif !defined (LIGHTMAP_ON)
+                    half4 shadowMask = unity_ProbesOcclusion;
+                #else
+                    half4 shadowMask = half4(1, 1, 1, 1);
+                #endif
+
             //  Get light
-                Light mainLight = GetMainLight(inputData.shadowCoord);
+                //Light mainLight = GetMainLight(inputData.shadowCoord);
+                Light mainLight = GetMainLight(inputData.shadowCoord, inputData.positionWS, shadowMask);
+
+
                 half3 lightColorAndAttenuation = mainLight.color * (mainLight.distanceAttenuation * mainLight.shadowAttenuation);
 
 half3 shad =  lightColorAndAttenuation;               

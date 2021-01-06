@@ -3,7 +3,7 @@
     Properties
     {
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
 
         [Enum(UnityEngine.Rendering.CompareFunction)]
         _ZTest                              ("ZTest", Int) = 4
@@ -23,7 +23,7 @@
 
        
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [MainTexture] _BaseMap              ("Albedo", 2D) = "white" {}
         [MainColor] _BaseColor              ("Color", Color) = (1,1,1,1)
 
@@ -36,7 +36,7 @@
 
         [Toggle(_BENTNORMAL)]
         _EnableBentNormal ("Enable Bent Normal Map", Float) = 0
-        _BentNormalMap                      ("Bent Normal Map", 2D) = "bump" {}
+        _BentNormalMap                         ("Bent Normal Map", 2D) = "bump" {}
 
         [Space(5)]
         [Toggle(_PARALLAX)]
@@ -68,7 +68,7 @@
         _EnableMetalSpec                    ("Enable Spec/Metal Map", Float) = 0.0
 
         [Header(Additional Maps)]
-        [Space(10)]
+        [Space(8)]
         [Toggle(_OCCLUSIONMAP)] 
         _EnableOcclusion                    ("Enable Occlusion", Float) = 0.0
         [NoScaleOffset] _OcclusionMap       ("     Occlusion Map", 2D) = "white" {}
@@ -82,7 +82,7 @@
 
 
         [Header(Rim Lighting)]
-        [Space(5)]
+        [Space(8)]
         [HideInInspector] _Dummy("Dummy", Float) = 0.0 // needed by custum inspector
         
         [Toggle(_RIMLIGHTING)]
@@ -111,8 +111,7 @@
 
 
         [Header(Advanced)]
-        [Space(5)]
-
+        [Space(8)]
         [Toggle(_ENABLE_GEOMETRIC_SPECULAR_AA)]
         _GeometricSpecularAA                ("Geometric Specular AA", Float) = 0.0
         _ScreenSpaceVariance                ("     Screen Space Variance", Range(0.0, 1.0)) = 0.1
@@ -196,7 +195,6 @@
 
             HLSLPROGRAM
             // Required to compile gles 2.0 with standard SRP library
-            // All shaders must be compiled with HLSLcc and currently only gles is not using HLSLcc by default
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
             #pragma target 2.0
@@ -206,39 +204,38 @@
 
             #define _UBER
 
-            #pragma shader_feature _NORMALMAP
-            #pragma shader_feature _SAMPLENORMAL
+            #pragma shader_feature_local _NORMALMAP
 
-            #pragma shader_feature_local _PARALLAX
-            #pragma shader_feature_local _BENTNORMAL
+            #pragma shader_feature_local_fragment _SAMPLENORMAL
+            #pragma shader_feature_local_fragment _PARALLAX
+            #pragma shader_feature_local_fragment _BENTNORMAL
+            #pragma shader_feature_local_fragment _ENABLE_GEOMETRIC_SPECULAR_AA
+            #pragma shader_feature_local_fragment _ENABLE_AO_FROM_GI
+            #pragma shader_feature_local_fragment _RIMLIGHTING
+            #pragma shader_feature_local_fragment _FADING_ON
 
-            #pragma shader_feature_local _ENABLE_GEOMETRIC_SPECULAR_AA
-            #pragma shader_feature_local _ENABLE_AO_FROM_GI
-
-            #pragma shader_feature_local _RIMLIGHTING
-
-            #pragma shader_feature_local _FADING_ON
-
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _ALPHAPREMULTIPLY_ON
-            #pragma shader_feature _EMISSION            
-            #pragma shader_feature _METALLICSPECGLOSSMAP
-            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
-            #pragma shader_feature _OCCLUSIONMAP
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _ALPHAPREMULTIPLY_ON
+            #pragma shader_feature_local_fragment _EMISSION            
+            #pragma shader_feature_local_fragment _METALLICSPECGLOSSMAP
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma shader_feature_local_fragment _OCCLUSIONMAP
             
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _SPECULAR_SETUP
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local_fragment _SPECULAR_SETUP
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -249,8 +246,9 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
-#pragma multi_compile __ LOD_FADE_CROSSFADE
+            #pragma multi_compile __ LOD_FADE_CROSSFADE
             
             #pragma vertex LitPassVertexUber
             #pragma fragment LitPassFragmentUber
@@ -261,19 +259,18 @@
             #include "Includes/Lux URP Lit Extended Lighting.hlsl"
 
 
-
             half4 LitPassFragmentUber(Varyings input, half facing : VFACE) : SV_Target
             {
                 UNITY_SETUP_INSTANCE_ID(input);
                 UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
 
-                //  LOD crossfading
+            //  LOD crossfading
                 #if defined(LOD_FADE_CROSSFADE) && !defined(SHADER_API_GLES)
                     //LODDitheringTransition(input.positionCS.xy, unity_LODFade.x);
                     clip (unity_LODFade.x - Dither32(input.positionCS.xy, 1));
                 #endif
 
-                //  Camera Fading
+            //  Camera Fading
                 #if defined(_ALPHATEST_ON) && defined(_FADING_ON)
                     clip ( input.positionCS.w - _CameraFadeDist - Dither32(input.positionCS.xy, 1));                   
                 #endif
@@ -330,7 +327,7 @@
                 #endif
 
                 #if defined(_RIMLIGHTING)
-half rim = saturate(1.0h - saturate( dot(inputData.normalWS, inputData.viewDirectionWS ) ) );
+                    half rim = saturate(1.0h - saturate( dot(inputData.normalWS, inputData.viewDirectionWS ) ) );
                     half power = _RimPower;
                     UNITY_BRANCH if(_RimFrequency > 0 ) {
                         half perPosition = lerp(0.0h, 1.0h, dot(1.0h, frac(UNITY_MATRIX_M._m03_m13_m23) * 2.0h - 1.0h ) * _RimPerPositionFrequency ) * 3.1416h;
@@ -373,20 +370,23 @@ half rim = saturate(1.0h - saturate( dot(inputData.normalWS, inputData.viewDirec
             Tags{"LightMode" = "ShadowCaster"}
 
             ZWrite On
-            //ZTest LEqual
             ZTest [_ZTest]
+            ColorMask 0
             Cull[_Cull]
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard srp library
+            // Required to compile gles 2.0 with standard SRP library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
             #pragma target 2.0
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            
+            #define _UBER
+
+            #pragma shader_feature_local _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
             //#pragma shader_feature _NORMALMAP
             #pragma shader_feature_local _PARALLAXSHADOWS
@@ -399,7 +399,9 @@ half rim = saturate(1.0h - saturate( dot(inputData.normalWS, inputData.viewDirec
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
-#pragma multi_compile __ LOD_FADE_CROSSFADE
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+
+            #pragma multi_compile __ LOD_FADE_CROSSFADE
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
@@ -524,7 +526,7 @@ half rim = saturate(1.0h - saturate( dot(inputData.normalWS, inputData.viewDirec
             Cull[_Cull]
 
             HLSLPROGRAM
-            // Required to compile gles 2.0 with standard srp library
+            // Required to compile gles 2.0 with standard SRP library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
             #pragma target 2.0
@@ -534,12 +536,15 @@ half rim = saturate(1.0h - saturate( dot(inputData.normalWS, inputData.viewDirec
 
             // -------------------------------------
             // Material Keywords
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+
+            #define _UBER
+
+            #pragma shader_feature_local _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
             //#pragma shader_feature _NORMALMAP
             #pragma shader_feature_local _PARALLAX
-            #pragma shader_feature_local _FADING_ON
+            #pragma shader_feature_local_fragment _FADING_ON
 
             #if defined (_PARALLAX) && !defined(_NORMALMAP)
                 #define _NORMALMAP
@@ -548,7 +553,9 @@ half rim = saturate(1.0h - saturate( dot(inputData.normalWS, inputData.viewDirec
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
-#pragma multi_compile __ LOD_FADE_CROSSFADE
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+
+            #pragma multi_compile __ LOD_FADE_CROSSFADE
 
             #include "Includes/Lux URP Lit Extended Inputs.hlsl"
             //#include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
@@ -643,6 +650,153 @@ half rim = saturate(1.0h - saturate( dot(inputData.normalWS, inputData.viewDirec
             ENDHLSL
         }
 
+
+    //  Depth Normal --------------------------------------------------------
+
+        // This pass is used when drawing to a _CameraNormalsTexture texture
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard SRP library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalVertex
+            #pragma fragment DepthNormalFragment
+
+            // -------------------------------------
+            // Material Keywords
+
+            #define _UBER
+
+            #pragma shader_feature_local _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+
+            //#pragma shader_feature _NORMALMAP
+            #pragma shader_feature_local _PARALLAX
+            #pragma shader_feature_local _FADING_ON
+
+            #if defined (_PARALLAX) && !defined(_NORMALMAP)
+                #define _NORMALMAP
+            #endif
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+
+            #pragma multi_compile __ LOD_FADE_CROSSFADE
+
+            #include "Includes/Lux URP Lit Extended Inputs.hlsl"
+            //#include "Packages/com.unity.render-pipelines.universal/Shaders/DepthOnlyPass.hlsl"
+
+            VertexOutput DepthNormalVertex(VertexInput input)
+            {
+                VertexOutput output = (VertexOutput)0;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+
+                float3 positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                output.positionCS = TransformWorldToHClip(positionWS);
+
+                VertexNormalInputs normalInput = GetVertexNormalInputs(input.normalOS, input.tangentOS);
+                output.normalWS = normalInput.normalWS;
+
+                #if defined(_ALPHATEST_ON)
+
+                    //#if defined(_FADING_ON)
+                    //    output.screenPos = ComputeScreenPos(output.positionCS);
+                    //#endif
+
+                    output.uv = TRANSFORM_TEX(input.texcoord, _BaseMap);
+
+                    #if defined(_PARALLAX)
+                        
+                        //half3x3 tangentSpaceRotation =  half3x3(normalInput.tangentWS, normalInput.bitangentWS, normalInput.normalWS);
+                    //  was half3 - but output is float?! lets add normalize here - not: it breaks the regular pass...
+                        output.viewDirWS = GetCameraPositionWS() - positionWS;
+                        //output.viewDirTS = SafeNormalize( mul(tangentSpaceRotation, viewDirWS) );
+                        
+                        //output.tangentWS = normalInput.tangentWS;
+                        float sign = input.tangentOS.w * GetOddNegativeScale();
+                        output.tangentWS = float4(normalInput.tangentWS.xyz, sign);
+                        //output.bitangentWS = half4(normalInput.bitangentWS, viewDirWS.z);
+                    #endif
+                #endif
+
+                return output;
+            }
+
+            half4 DepthNormalFragment(VertexOutput input) : SV_TARGET
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+
+                //  LOD crossfading
+                #if defined(LOD_FADE_CROSSFADE) && !defined(SHADER_API_GLES)
+                    //LODDitheringTransition(input.positionCS.xy, unity_LODFade.x);
+                    clip (unity_LODFade.x - Dither32(input.positionCS.xy, 1));
+                #endif
+
+                #if defined(_ALPHATEST_ON)
+
+                    #if defined(_FADING_ON)
+                        //float4 screenPos = input.screenPos;
+                        clip ( input.positionCS.w - _CameraFadeDist - Dither32(input.positionCS.xy, 1));
+                        //clip ( input.positionCS.w - _CameraFadeDist - Dither32(screenPos.xy / screenPos.w * _ScreenParams.xy, 1));
+                    #endif
+
+                    float2 uv = input.uv;
+
+                    #if defined(_PARALLAX)
+                
+                    //  Parallax
+                        half sgn = input.tangentWS.w;      // should be either +1 or -1
+                        half3 bitangentWS = sgn * cross(input.normalWS.xyz, input.tangentWS.xyz);
+
+                        half3x3 tangentSpaceRotation =  half3x3(input.tangentWS.xyz, bitangentWS.xyz, input.normalWS.xyz);
+                        //half3 viewDirWS = half3(input.normalWS.w, input.tangentWS.w, input.bitangentWS.w);
+                        half3 viewDirWS = input.viewDirWS;
+                        half3 viewDirTS = SafeNormalize( mul(tangentSpaceRotation, viewDirWS) );
+
+                        float3 v = SafeNormalize(viewDirTS);
+                        v.z += 0.42;
+                        v.xy /= v.z;
+                        float halfParallax = _Parallax * 0.5f;
+                        float parallax = SAMPLE_TEXTURE2D(_HeightMap, sampler_HeightMap, uv).g * _Parallax - halfParallax;
+                        float2 offset1 = parallax * v.xy;
+                    //  Calculate 2nd height
+                        parallax = SAMPLE_TEXTURE2D(_HeightMap, sampler_HeightMap, uv + offset1).g * _Parallax - halfParallax;
+                        float2 offset2 = parallax * v.xy;
+                    //  Final UVs
+                        uv += (offset1 + offset2) * 0.5f;
+                    #endif
+
+                    half alpha = SAMPLE_TEXTURE2D(_BaseMap, sampler_BaseMap, uv).a * _BaseColor.a;
+                    clip (alpha - _Cutoff);
+                #endif
+
+                float3 normal = input.normalWS;
+            //  Handle backface rendering
+                normal = TransformWorldToViewDir(normal, true);
+                normal.z = abs(normal.z);
+                return float4(PackNormalOctRectEncode(normal), 0.0, 0.0);
+
+            }
+
+            ENDHLSL
+        }        
+
+    //  Meta -------------------------------------------------------------
+
         // This pass it not used during regular rendering, only for lightmap baking.
         Pass
         {
@@ -659,15 +813,17 @@ half rim = saturate(1.0h - saturate( dot(inputData.normalWS, inputData.viewDirec
             #pragma vertex UniversalVertexMeta
             #pragma fragment UniversalFragmentMeta
 
+            #define _UBER
+
             #define _PARALLAX
 
-            #pragma shader_feature _SPECULAR_SETUP
-            #pragma shader_feature _EMISSION
-            #pragma shader_feature _METALLICSPECGLOSSMAP
-            #pragma shader_feature _ALPHATEST_ON
-            #pragma shader_feature _ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+            #pragma shader_feature_local_fragment _SPECULAR_SETUP
+            #pragma shader_feature_local_fragment _EMISSION
+            #pragma shader_feature_local_fragment _METALLICSPECGLOSSMAP
+            #pragma shader_feature_local _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _ _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
 
-            #pragma shader_feature _SPECGLOSSMAP
+            #pragma shader_feature_local_fragment _SPECGLOSSMAP
 
             #include "Includes/Lux URP Lit Extended Inputs.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/Shaders/LitMetaPass.hlsl"

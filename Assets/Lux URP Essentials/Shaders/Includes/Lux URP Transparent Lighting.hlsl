@@ -1,7 +1,7 @@
 #ifndef LIGHTWEIGHT_TRANSPARENTLIGHTING_INCLUDED
 #define LIGHTWEIGHT_TRANSPARENTLIGHTING_INCLUDED
 
-half4 LuxURPTransparentFragmentPBR(InputData inputData, half3 albedo, half metallic, half3 specular,
+half4 LuxLWRPTransparentFragmentPBR(InputData inputData, half3 albedo, half metallic, half3 specular,
     half smoothness, half occlusion, half3 emission, half alpha
 )
 {
@@ -22,8 +22,8 @@ half4 LuxURPTransparentFragmentPBR(InputData inputData, half3 albedo, half metal
     color += LightingPhysicallyBased(brdfData, mainLight, inputData.normalWS, inputData.viewDirectionWS);
 
     #ifdef _ADDITIONAL_LIGHTS
-        uint pixelLightCount = GetAdditionalLightsCount();
-        for (uint i = 0u; i < pixelLightCount; ++i)
+        int pixelLightCount = GetAdditionalLightsCount();
+        for (int i = 0; i < pixelLightCount; ++i)
         {
             Light light = GetAdditionalLight(i, inputData.positionWS);
             color += LightingPhysicallyBased(brdfData, light, inputData.normalWS, inputData.viewDirectionWS);

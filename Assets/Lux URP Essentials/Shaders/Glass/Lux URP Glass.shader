@@ -8,7 +8,7 @@ Shader "Lux URP/Glass"
         [HeaderHelpLuxURP_URL(3fte1chjgh54)]
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(Off,0,On,1)]_ZWrite   ("ZWrite", Float) = 1.0
         [Enum(UnityEngine.Rendering.CullMode)]
         _Cull                       ("Culling", Float) = 2
@@ -20,7 +20,7 @@ Shader "Lux URP/Glass"
 
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [MainColor]
         _BaseColor                  ("Color (RGB) Alpha (A)", Color) = (1,1,1,0)
         [Toggle(_BASEMAP)]
@@ -47,7 +47,7 @@ Shader "Lux URP/Glass"
 
 
         [Header(Refrection)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_GEOREFRACTIONS)]
         _EnableGeoRefr              ("Enable geometric Refractions", Float) = 1.0
         _IOR                        ("     Index of Refraction", Float) = 1.33
@@ -67,7 +67,7 @@ Shader "Lux URP/Glass"
 
         
         [Header(Rim Lighting)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_RIMLIGHTING)]
         _Rim                        ("Enable Rim Lighting", Float) = 0
         [HDR] _RimColor             ("Rim Color", Color) = (0.5,0.5,0.5,1)
@@ -78,7 +78,7 @@ Shader "Lux URP/Glass"
 
 
         [Header(Stencil)]
-        [Space(5)]
+        [Space(8)]
         [IntRange] _Stencil         ("Stencil Reference", Range (0, 255)) = 0
         [IntRange] _ReadMask        ("     Read Mask", Range (0, 255)) = 255
         [IntRange] _WriteMask       ("     Write Mask", Range (0, 255)) = 255
@@ -93,7 +93,7 @@ Shader "Lux URP/Glass"
 
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff]
         _SpecularHighlights         ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
@@ -141,8 +141,6 @@ Shader "Lux URP/Glass"
             // Required to compile gles 2.0 with standard SRP library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-
-        //  Shader target needs to be 3.0 due to tex2Dlod in the vertex shader and VFACE
             #pragma target 2.0
 
             // -------------------------------------
@@ -153,32 +151,30 @@ Shader "Lux URP/Glass"
 
             #define _ALPHAPREMULTIPLY_ON
 
-            #pragma shader_feature_local _GEOREFRACTIONS
-            #pragma shader_feature_local _SCREENEDGEFADE
+            #pragma shader_feature_local _NORMALMAP
 
-            #pragma shader_feature_local _FINALALPHA
-            #pragma shader_feature_local _ADDITIVE
+            #pragma shader_feature_local_fragment _GEOREFRACTIONS
+            #pragma shader_feature_local_fragment _SCREENEDGEFADE
 
-            #pragma shader_feature_local _BASEMAP
-            #pragma shader_feature_local _MASKMAP
-            #pragma shader_feature _NORMALMAP
-            #pragma shader_feature_local _EXCLUDEFOREGROUND
-            
-            #pragma shader_feature_local _RIMLIGHTING
+            #pragma shader_feature_local_fragment _FINALALPHA
+            #pragma shader_feature_local_fragment _ADDITIVE
+            #pragma shader_feature_local_fragment _BASEMAP
+            #pragma shader_feature_local_fragment _MASKMAP
+            #pragma shader_feature_local_fragment _EXCLUDEFOREGROUND
+            #pragma shader_feature_local_fragment _RIMLIGHTING
 
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
-
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
 
             // -------------------------------------
             // Lightweight Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
 
             // -------------------------------------
             // Unity defined keywords
@@ -189,6 +185,7 @@ Shader "Lux URP/Glass"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
         //  Include base inputs and all other needed "base" includes
             #include "Includes/Lux URP Glass Inputs.hlsl"
@@ -464,7 +461,7 @@ Shader "Lux URP/Glass"
                 #endif
 
             //  Apply lighting
-                half4 color = LuxURPTransparentFragmentPBR (
+                half4 color = LuxLWRPTransparentFragmentPBR (
                     inputData, 
                     surfaceData.albedo,
                     surfaceData.metallic, 
@@ -526,6 +523,9 @@ Shader "Lux URP/Glass"
                 outSurfaceData.normalTS = half3(0,0,1);
                 outSurfaceData.occlusion = 1;
                 outSurfaceData.emission = 0;
+
+                outSurfaceData.clearCoatMask = 0;
+                outSurfaceData.clearCoatSmoothness = 0;
             }
 
         //  Finally include the meta pass related stuff  

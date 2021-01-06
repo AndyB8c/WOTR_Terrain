@@ -5,19 +5,19 @@
         [HeaderHelpLuxURP_URL(v7hplahjb13)]
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff(_RECEIVE_SHADOWS_OFF)]
         _ReceiveShadows             ("Receive Shadows", Float) = 1.0
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [Toggle(_NORMALMAP)]
         _ApplyNormal                ("Enable Normal Maps", Float) = 1.0
         [Toggle(_TOPDOWNPROJECTION)]
         _ApplyTopDownProjection     ("Enable Top Down Projection", Float) = 0.0
         _TopDownTiling              ("     Tiling in World Space", Float) = 1.0
 
-        [Space(10)]
+        [Space(5)]
         [NoScaleOffset] _DetailA0   ("Detail 0  Albedo (RGB) Smoothness (A)", 2D) = "gray" {}
         [NoScaleOffset] _Normal0    ("     Normal 0", 2D) = "bump" {}
         [NoScaleOffset] _DetailA1   ("Detail 1  Albedo (RGB) Smoothness (A)", 2D) = "gray" {}
@@ -27,18 +27,18 @@
         [NoScaleOffset] _DetailA3   ("Detail 3  Albedo (RGB) Smoothness (A)", 2D) = "gray" {}
         [NoScaleOffset] _Normal3    ("     Normal 3", 2D) = "bump" {}
         
-        [Space(10)]
+        [Space(5)]
         [Toggle(_USEVERTEXCOLORS)] 
         _VertexColors               ("Use Vertex Colors", Float) = 0.0
         [NoScaleOffset] _SplatMap   ("Splat Map (RGB)", 2D) = "red" {}
 
-        [Space(10)]
+        [Space(5)]
         [LuxURPVectorTwoDrawer] _SplatTiling("Detail Tiling (UV)", Vector) = (1,1,0,0)
         _Specular("Specular", Color) = (0.2,0.2,0.2,0)
         _Occlusion("Occlusion", Range(0, 1)) = 0
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff]
         _SpecularHighlights         ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
@@ -61,6 +61,7 @@
         }
         Pass
         {
+            Name "ForwardLit"
             Tags{"LightMode" = "UniversalForward"}
 
             Blend One Zero
@@ -72,24 +73,34 @@
             // Required to compile gles 2.0 with standard srp library
             #pragma prefer_hlslcc gles
             #pragma exclude_renderers d3d11_9x
-            #pragma target 3.0
+            #pragma target 2.0
 
         //  Tell Polybrush that this shader supports 4 texture channels
             #define Z_TEXTURE_CHANNELS 4
             #define Z_MESH_ATTRIBUTES COLOR
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Material Keywords
+            #define _SPECULAR_SETUP 1
+
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _TOPDOWNPROJECTION
+            #pragma shader_feature_local_fragment _USEVERTEXCOLORS
+
+            #pragma shader_feature_local_fragment _SPECULARHIGHLIGHTS_OFF
+            #pragma shader_feature_local_fragment _ENVIRONMENTREFLECTIONS_OFF
+            #pragma shader_feature_local _RECEIVE_SHADOWS_OFF
+
+            // -------------------------------------
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
-
-            #pragma shader_feature _SPECULARHIGHLIGHTS_OFF
-            #pragma shader_feature _ENVIRONMENTREFLECTIONS_OFF
-            #pragma shader_feature _RECEIVE_SHADOWS_OFF
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+            #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
             
             // -------------------------------------
             // Unity defined keywords
@@ -97,19 +108,14 @@
             #pragma multi_compile _ LIGHTMAP_ON
             #pragma multi_compile_fog
 
-            #pragma shader_feature_local _NORMALMAP
-            #pragma shader_feature_local _TOPDOWNPROJECTION
-            #pragma shader_feature_local _USEVERTEXCOLORS
-
             //--------------------------------------
             // GPU Instancing
+    //  Does this make sense here? Well: maybe
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #pragma vertex vert
             #pragma fragment frag
-
-            //#define _NORMALMAP 1
-            #define _SPECULAR_SETUP 1
 
             //#include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
         //  defines SurfaceData, textures and the functions Alpha, SampleAlbedoAlpha, SampleNormal, SampleEmission
@@ -195,9 +201,8 @@
                 output.uv0 = input.texcoord; //TRANSFORM_TEX(input.texcoord, _BaseMap);
                 output.positionWS = vertexInput.positionWS;
 
-                // already normalized from normal transform to WS.
+            //  Already normalized from normal transform to WS.
                 output.normalWS = normalInput.normalWS;
-                //output.normalWS = NormalizeNormalPerVertex(normalInput.normalWS);
                 output.viewDirWS = viewDirWS;
                 #ifdef _NORMALMAP
                     float sign = input.tangentOS.w * GetOddNegativeScale();
@@ -237,7 +242,6 @@
                 #endif
                 splatControl.a = 1.0h - splatControl.r - splatControl.g - splatControl.b;
                 
-
                 #if defined(_TOPDOWNPROJECTION)
                     float2 uvWS = input.positionWS.xz * _TopDownTiling;
                     half4 albedoAlpha = SAMPLE_TEXTURE2D(_DetailA0, sampler_DetailA0, uvWS) * splatControl.r;
@@ -288,6 +292,9 @@
                 outSurfaceData.specular = _Specular.rgb;
                 outSurfaceData.occlusion = 1.0h - _Occlusion;
                 outSurfaceData.alpha = 1;
+
+                outSurfaceData.clearCoatMask = 0;
+                outSurfaceData.clearCoatSmoothness = 0;
             }
 
 
@@ -335,6 +342,9 @@
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH, inputData.normalWS);
 
+                inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
+
                 half4 color = UniversalFragmentPBR(
                     inputData, 
                     surfaceData.albedo, 
@@ -356,13 +366,15 @@
 
             ENDHLSL
         }
+
         Pass
         {
             Name "ShadowCaster"
             Tags{"LightMode" = "ShadowCaster"}
 
-            ZWrite On ZTest LEqual
-
+            ZWrite On
+            ZTest LEqual
+            ColorMask 0
             Cull Back
 
             HLSLPROGRAM
@@ -374,6 +386,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
@@ -444,7 +457,6 @@
 
             ZWrite On
             ColorMask 0
-
             Cull Back
 
             HLSLPROGRAM
@@ -456,6 +468,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #pragma vertex vert
             #pragma fragment frag
@@ -506,6 +519,91 @@
             ENDHLSL
         }
 
+    //  Depth Normal ---------------------------------------------
+        // This pass is used when drawing to a _CameraNormalsTexture texture
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull Back
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local _NORMALMAP
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+
+            //#include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+            //#include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
+
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Lighting.hlsl"
+            #include "Packages/com.unity.render-pipelines.core/ShaderLibrary/Color.hlsl"
+
+            CBUFFER_START(UnityPerMaterial)
+                float2 _SplatTiling;
+                float4 _Specular;
+                float _Occlusion;
+                half _TopDownTiling;
+            CBUFFER_END
+
+            struct VertexInput
+            {
+                float4 positionOS : POSITION;
+                float3 normal     : NORMAL;
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+            };
+
+
+            struct VertexOutput
+            {
+                float4 positionCS      : SV_POSITION;
+                float3 normalWS        : TEXCOORD1;
+
+                UNITY_VERTEX_INPUT_INSTANCE_ID
+                UNITY_VERTEX_OUTPUT_STEREO
+            };
+
+            VertexOutput DepthNormalsVertex(VertexInput input)
+            {
+                VertexOutput output = (VertexOutput)0;
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_TRANSFER_INSTANCE_ID(input, output);
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(output);
+
+                output.positionCS = TransformObjectToHClip(input.positionOS.xyz);
+                VertexNormalInputs normalInput = GetVertexNormalInputs(input.normal, float4(1,1,1,1));
+                output.normalWS = NormalizeNormalPerVertex(normalInput.normalWS);
+                
+                return output;
+            }
+
+            half4 DepthNormalsFragment(VertexOutput input ) : SV_TARGET
+            {
+                UNITY_SETUP_INSTANCE_ID(input);
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(input);
+                return float4(PackNormalOctRectEncode(TransformWorldToViewDir(input.normalWS, true)), 0.0, 0.0);
+            }
+
+            ENDHLSL
+        }
+
+    //  Meta -----------------------------------------------------
+
         // This pass it not used during regular rendering, only for lightmap baking.
         Pass
         {
@@ -531,8 +629,8 @@
             //#define _NORMALMAP 1
             #define _SPECULAR_SETUP 1
 
-            #pragma shader_feature_local _TOPDOWNPROJECTION
-            #pragma shader_feature_local _USEVERTEXCOLORS
+            #pragma shader_feature_local_fragment _TOPDOWNPROJECTION
+            #pragma shader_feature_local_fragment _USEVERTEXCOLORS
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/MetaInput.hlsl"

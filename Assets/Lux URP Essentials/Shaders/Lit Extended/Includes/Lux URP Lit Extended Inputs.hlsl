@@ -9,6 +9,7 @@
 // Extended CBUFFER
 
 CBUFFER_START(UnityPerMaterial)
+    
     float4 _BaseMap_ST;
     half4 _BaseColor;
     half4 _SpecColor;
@@ -25,24 +26,24 @@ CBUFFER_START(UnityPerMaterial)
     half _RimFrequency;
     half _RimPerPositionFrequency;
 
-    //#if defined(_PARALLAX) || defined(_PARALLAXSHADOWS)
-        half _Parallax;
-    //#endif
+    #if defined(_UBER)
+        //#if defined(_PARALLAX) || defined(_PARALLAXSHADOWS)
+            half _Parallax;
+        //#endif
+        //#if defined(_ENABLE_GEOMETRIC_SPECULAR_AA)
+            half _ScreenSpaceVariance;
+            half _SAAThreshold;
+        //#endif 
+        //#if defined(_ENABLE_AO_FROM_GI)
+            half _GItoAO;
+            half _GItoAOBias;
+        //#endif
+        half _HorizonOcclusion;
+        float _CameraFadeDist;
+        float _CameraShadowFadeDist;
+    #endif
 
-    //#if defined(_ENABLE_GEOMETRIC_SPECULAR_AA)
-        half _ScreenSpaceVariance;
-        half _SAAThreshold;
-    //#endif 
-
-    //#if defined(_ENABLE_AO_FROM_GI)
-        half _GItoAO;
-        half _GItoAOBias;
-    //#endif
-
-    half _HorizonOcclusion;
-
-    float _CameraFadeDist;
-    float _CameraShadowFadeDist;
+    float _Surface;
 
 CBUFFER_END
 
@@ -78,10 +79,10 @@ TEXTURE2D(_BentNormalMap);      SAMPLER(sampler_BentNormalMap);
     {
         float4 positionCS                   : SV_POSITION;
         float2 uv                           : TEXCOORD0;
-
+        float3 normalWS                 : TEXCOORD1;
         #if defined(_ALPHATEST_ON)
         //  We have to use the same inputs...
-            float3 normalWS                 : TEXCOORD1;
+            
             float4 tangentWS                : TEXCOORD2;
             float screenPos                 : TEXCOORD3; // was float4
 
@@ -197,6 +198,9 @@ inline void InitializeStandardLitSurfaceData(float2 uv, out SurfaceData outSurfa
     outSurfaceData.normalTS = SampleNormal(uv, TEXTURE2D_ARGS(_BumpMap, sampler_BumpMap), _BumpScale);
     outSurfaceData.occlusion = SampleOcclusion(uv);
     outSurfaceData.emission = SampleEmission(uv, _EmissionColor.rgb, TEXTURE2D_ARGS(_EmissionMap, sampler_EmissionMap));
+
+    outSurfaceData.clearCoatMask = 0;
+    outSurfaceData.clearCoatSmoothness = 0;
 }
 
 #if defined(_UBER)
@@ -245,6 +249,9 @@ inline void InitializeStandardLitSurfaceData(float2 uv, out SurfaceData outSurfa
         #else
             outSurfaceData.emission = 0;
         #endif
+
+        outSurfaceData.clearCoatMask = 0;
+        outSurfaceData.clearCoatSmoothness = 0;
     }
 #endif
 

@@ -5,7 +5,7 @@
         [HeaderHelpLuxURP_URL(gpukpasbzt01)]
         
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CompareFunction)] _ZTest ("ZTest", Int) = 4
         [Enum(UnityEngine.Rendering.CullMode)] _Cull ("Culling", Float) = 2
 
@@ -16,6 +16,7 @@
 
 
         [Header(Outline)]
+        [Space(8)]
         _Color ("Color", Color) = (1,1,1,1)
         _Border ("Width", Float) = 3
 
@@ -57,7 +58,7 @@
             #pragma exclude_renderers d3d11_9x
             #pragma target 2.0
 
-            #pragma shader_feature_local _APPLYFOG
+            #pragma shader_feature_local_fragment _APPLYFOG
 
             // -------------------------------------
             // Lightweight Pipeline keywords
@@ -69,6 +70,7 @@
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
             
             #pragma vertex vert
             #pragma fragment frag

@@ -6,7 +6,7 @@ Shader "Lux URP/Versatile Blend"
         [HeaderHelpLuxURP_URL(bmrgpp8nhuvj)]
       
         [Header(Surface Blending)]
-        [Space(5)]
+        [Space(8)]
         _Shift                      ("Depth Shift", Range(0.0, 0.03)) = 0.01
         _AlphaShift                 ("Alpha Shift", Range(0.0, 1)) = 0.1
         _AlphaWidth                 ("Alpha Contraction", Range(0.0, 20)) = 4
@@ -16,7 +16,7 @@ Shader "Lux URP/Versatile Blend"
         _ShadowShiftView            ("Shadow Shift View", Range(0, 1)) = 0
 
         [Header(Surface Options)]
-        [Space(5)]
+        [Space(8)]
         [Enum(UnityEngine.Rendering.CullMode)]
         _Cull                       ("Culling", Float) = 2
         [Enum(Off,0,On,1)]
@@ -29,7 +29,7 @@ Shader "Lux URP/Versatile Blend"
 
 
         [Header(Surface Inputs)]
-        [Space(5)]
+        [Space(8)]
         [MainColor]
         _BaseColor                  ("Color", Color) = (1,1,1,1)
         [MainTexture]
@@ -48,7 +48,7 @@ Shader "Lux URP/Versatile Blend"
 
 
         [Header(Advanced)]
-        [Space(5)]
+        [Space(8)]
         [ToggleOff]
         _SpecularHighlights         ("Enable Specular Highlights", Float) = 1.0
         [ToggleOff]
@@ -127,14 +127,15 @@ Shader "Lux URP/Versatile Blend"
             #pragma shader_feature _RECEIVE_SHADOWS_OFF
 
             // -------------------------------------
-            // Lightweight Pipeline keywords
+            // Universal Pipeline keywords
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS
-
             #pragma multi_compile _ _MAIN_LIGHT_SHADOWS_CASCADE
             #pragma multi_compile _ _ADDITIONAL_LIGHTS_VERTEX _ADDITIONAL_LIGHTS
-            #pragma multi_compile _ _ADDITIONAL_LIGHT_SHADOWS
-            #pragma multi_compile _ _SHADOWS_SOFT
-            #pragma multi_compile _ _MIXED_LIGHTING_SUBTRACTIVE
+            #pragma multi_compile_fragment _ _ADDITIONAL_LIGHT_SHADOWS
+            #pragma multi_compile_fragment _ _SHADOWS_SOFT
+//          #pragma multi_compile_fragment _ _SCREEN_SPACE_OCCLUSION
+            #pragma multi_compile _ LIGHTMAP_SHADOW_MIXING
+            #pragma multi_compile _ SHADOWS_SHADOWMASK
 
             // -------------------------------------
             // Unity defined keywords
@@ -145,6 +146,7 @@ Shader "Lux URP/Versatile Blend"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
         //  Include base inputs and all other needed "base" includes
             #include "Includes/Lux URP Versatile Blend Inputs.hlsl"
@@ -254,6 +256,10 @@ Shader "Lux URP/Versatile Blend"
                 inputData.fogCoord = input.fogFactorAndVertexLight.x;
                 inputData.vertexLighting = input.fogFactorAndVertexLight.yzw;
                 inputData.bakedGI = SAMPLE_GI(input.lightmapUV, input.vertexSH * occlusion, inputData.normalWS);
+
+//  this shader is transaprent so it will never write to depth normal...
+//  inputData.normalizedScreenSpaceUV = GetNormalizedScreenSpaceUV(input.positionCS);
+                inputData.shadowMask = SAMPLE_SHADOWMASK(input.lightmapUV);
             }
 
             half4 LitPassFragment(VertexOutput input) : SV_Target
@@ -344,6 +350,7 @@ Shader "Lux URP/Versatile Blend"
 
             ZWrite On
             ZTest LEqual
+            ColorMask 0
             Cull [_Cull]
 
             HLSLPROGRAM
@@ -360,6 +367,7 @@ Shader "Lux URP/Versatile Blend"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
 
             #pragma vertex ShadowPassVertex
             #pragma fragment ShadowPassFragment
@@ -434,6 +442,7 @@ Shader "Lux URP/Versatile Blend"
             //--------------------------------------
             // GPU Instancing
             #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
             
             #define DEPTHONLYPASS
             #include "Includes/Lux URP Versatile Blend Inputs.hlsl"
@@ -466,6 +475,43 @@ Shader "Lux URP/Versatile Blend"
                 return 0;
             }
 
+            ENDHLSL
+        }
+
+    //  Depth Normal ----------------------------------------------------- 
+    //  this shader is transparent so it will never write to depth normal...
+
+        // This pass is used when drawing to a _CameraNormalsTexture texture
+        Pass
+        {
+            Name "DepthNormals"
+            Tags{"LightMode" = "DepthNormals"}
+
+            ZWrite On
+            Cull[_Cull]
+
+            HLSLPROGRAM
+            // Required to compile gles 2.0 with standard srp library
+            #pragma prefer_hlslcc gles
+            #pragma exclude_renderers d3d11_9x
+            #pragma target 2.0
+
+            #pragma vertex DepthNormalsVertex
+            #pragma fragment DepthNormalsFragment
+
+            // -------------------------------------
+            // Material Keywords
+            #pragma shader_feature_local _NORMALMAP
+            #pragma shader_feature_local_fragment _ALPHATEST_ON
+            #pragma shader_feature_local_fragment _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+
+            //--------------------------------------
+            // GPU Instancing
+            #pragma multi_compile_instancing
+            // #pragma multi_compile _ DOTS_INSTANCING_ON // needs shader target 4.5
+
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/LitInput.hlsl"
+            #include "Packages/com.unity.render-pipelines.universal/Shaders/DepthNormalsPass.hlsl"
             ENDHLSL
         }
 
@@ -503,6 +549,9 @@ Shader "Lux URP/Versatile Blend"
                 outSurfaceData.normalTS = half3(0,0,1);
                 outSurfaceData.occlusion = 1;
                 outSurfaceData.emission = 0;
+
+                outSurfaceData.clearCoatMask = 0;
+                outSurfaceData.clearCoatSmoothness = 0;
             }
 
         //  Finally include the meta pass related stuff  
