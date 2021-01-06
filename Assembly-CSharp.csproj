@@ -2,18 +2,20 @@
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <LangVersion>latest</LangVersion>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>10.0.20506</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <RootNamespace></RootNamespace>
+    <RootNamespace>
+    </RootNamespace>
     <ProjectGuid>{0E2E870A-3A3D-7C3C-244A-1F9FAADEB70F}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <AssemblyName>Assembly-CSharp</AssemblyName>
-    <TargetFrameworkVersion>v4.7.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <BaseDirectory>.</BaseDirectory>
   </PropertyGroup>
@@ -342,44 +344,44 @@
     <Compile Include="Assets\Malbers Animations\Common\Scripts\Weapons\HolsterID.cs" />
   </ItemGroup>
   <ItemGroup>
-     <None Include="Assets\Samples\Terrain Tools\0.1.0-preview\Terrain Assets\ThirdPartyNotices.txt" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Mask8Toon.shader" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-Skin Forward.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\DragonEggs_Shader.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Color4x2.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Color4x4.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Mask4Toon.shader" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Shaders 1.2.txt" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Mask4Realistic.shader" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Unity Standard\ToonLit.shader" />
-     <None Include="Assets\SWS\README.txt" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Golem Shader.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Color3x3.shader" />
-     <None Include="Assets\SWS\Changelog.txt" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Color4x3.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Wind Shader.shader" />
-     <None Include="Assets\Heroes - Orc Warrior\Animations\Animations.txt" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-SkinCutout Forward Specular DoubleSided.shader" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Unity Standard\ToonBasic.shader" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\StandardDoubleSided.shader" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-SkinCutout Forward DoubleSided.shader" />
-     <None Include="Assets\SWS\Extensions\DOTween\DOTween.XML" />
-     <None Include="Assets\Scenes\Shader\SeaWaterShader.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\AnisotropicCircular.shader" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-Skin Defered.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\AnisotropicWard.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\MWater2.shader" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-Ice.shader" />
-     <None Include="Assets\Medieval Mega Pack\Rock_Cover_Standard.shader" />
-     <None Include="Assets\SWS\Extensions\DOTween\readme.txt" />
-     <None Include="Assets\SWS\Extensions\DOTween\DOTween.dll" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-SkinCutout Defered DoubleSided.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Color4x4 v2.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Color4x2 Emission.shader" />
-     <None Include="Assets\SWS\Examples\Assets\Shaders\DiffuseReflectiveShader.shader" />
-     <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Unity Standard\ToonBasicOutline_modified.shader" />
-     <None Include="Assets\Malbers Animations\Common\Shaders\Mask8Realistic.shader" />
-     <None Include="Assets\Malbers Animations\Common\Fonts\OpenSans\License!.txt" />
+    <None Include="Assets\Samples\Terrain Tools\0.1.0-preview\Terrain Assets\ThirdPartyNotices.txt" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Mask8Toon.shader" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-Skin Forward.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\DragonEggs_Shader.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Color4x2.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Color4x4.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Mask4Toon.shader" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Shaders 1.2.txt" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Mask4Realistic.shader" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Unity Standard\ToonLit.shader" />
+    <None Include="Assets\SWS\README.txt" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Golem Shader.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Color3x3.shader" />
+    <None Include="Assets\SWS\Changelog.txt" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Color4x3.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Wind Shader.shader" />
+    <None Include="Assets\Heroes - Orc Warrior\Animations\Animations.txt" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-SkinCutout Forward Specular DoubleSided.shader" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Unity Standard\ToonBasic.shader" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\StandardDoubleSided.shader" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-SkinCutout Forward DoubleSided.shader" />
+    <None Include="Assets\SWS\Extensions\DOTween\DOTween.XML" />
+    <None Include="Assets\Scenes\Shader\SeaWaterShader.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\AnisotropicCircular.shader" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-Skin Defered.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\AnisotropicWard.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\MWater2.shader" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-Ice.shader" />
+    <None Include="Assets\Medieval Mega Pack\Rock_Cover_Standard.shader" />
+    <None Include="Assets\SWS\Extensions\DOTween\readme.txt" />
+    <None Include="Assets\SWS\Extensions\DOTween\DOTween.dll" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-SkinCutout Defered DoubleSided.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Color4x4 v2.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Color4x2 Emission.shader" />
+    <None Include="Assets\SWS\Examples\Assets\Shaders\DiffuseReflectiveShader.shader" />
+    <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Unity Standard\ToonBasicOutline_modified.shader" />
+    <None Include="Assets\Malbers Animations\Common\Shaders\Mask8Realistic.shader" />
+    <None Include="Assets\Malbers Animations\Common\Fonts\OpenSans\License!.txt" />
     <Reference Include="UnityEngine">
       <HintPath>C:\Program Files\Unity\Hub\Editor\2020.2.0b14\Editor\Data\Managed\UnityEngine\UnityEngine.dll</HintPath>
     </Reference>
