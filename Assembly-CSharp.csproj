@@ -380,7 +380,9 @@
      <None Include="Assets\Malbers Animations\Common\Shaders\DragonEggs_Shader.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Billboard\Includes\Lux URP Billboard Inputs.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shaders\Terrain Blend\Includes\Lux URP Terrain Blend Inputs.hlsl" />
+     <None Include="Assets\BadDog\ForwardSSRWater_LWRP\Shaders\BGWaterBase.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shaders\Terrain Blend\Lux URP Terrain Blend.shader" />
+     <None Include="Assets\BadDog\ForwardSSRWater_LWRP\Shaders\BGWater.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Includes\Lux URP Cloth Lighting.hlsl" />
      <None Include="Assets\Malbers Animations\Common\Shaders\Color4x2.shader" />
      <None Include="Assets\Lux URP Essentials\Scripts\Resources\Lux URP WindComposite.shader" />
@@ -397,6 +399,7 @@
      <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Shaders 1.2.txt" />
      <None Include="Assets\Malbers Animations\Common\Shaders\Mask4Realistic.shader" />
      <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Unity Standard\ToonLit.shader" />
+     <None Include="Assets\BadDog\ForwardSSRWater_URP\Shaders\BGWaterSSR.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shaders\Decals\Lux URP Unlit Decal.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Tree Creator\CameraFacingBillboardTree.shader" />
      <None Include="Assets\SWS\README.txt" />
@@ -430,6 +433,8 @@
      <None Include="Assets\Malbers Animations\Common\Shaders\Wind Shader.shader" />
      <None Include="Assets\Heroes - Orc Warrior\Animations\Animations.txt" />
      <None Include="Assets\Lux URP Essentials\Shaders\Vegetation\Lux URP Grass.shader" />
+     <None Include="Assets\BadDog\ForwardSSRWater_LWRP\Shaders\BGWaterSSR.hlsl" />
+     <None Include="Assets\BadDog\ForwardSSRWater_URP\Shaders\BGWaterBase.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shaders\Clear Coat\Lux URP Clear Coat.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Terrain Mesh\Lux URP MeshTerrain.shader" />
      <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Polygonmaker-AS-SkinCutout Forward Specular DoubleSided.shader" />
@@ -438,10 +443,12 @@
      <None Include="Assets\Lux URP Essentials\Shaders\Versatile Blend\Includes\Lux URP Versatile Blend Inputs.hlsl" />
      <None Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Shaders\Simple Displacement FX Debug.shader" />
      <None Include="Assets\Lux URP Essentials\Shader Graphs\Includes\Lux_Lighting_Transparent.hlsl" />
+     <None Include="Assets\BadDog\ForwardSSRWater_LWRP\Shaders\BGWaterStruct.hlsl" />
      <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Unity Standard\ToonBasic.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Lit Extended\Lux URP Lit Extended.shader" />
      <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\StandardDoubleSided.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Tree Creator\Includes\Lux URP Tree Creator Inputs.hlsl" />
+     <None Include="Assets\BadDog\ForwardSSRWater_URP\Shaders\BGWater.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Terrain\Includes\TerrainLitInput.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shaders\Toon\Lux URP Toon &amp; Outline.shader" />
      <None Include="Assets\Lux URP Essentials\Shader Graphs\Includes\Lux_Lighting_Skin.hlsl" />
@@ -469,9 +476,11 @@
      <None Include="Assets\Lux URP Essentials\Shaders\Toon\Lux URP Toon.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Toon\Includes\Lux URP Toon Inputs.hlsl" />
      <None Include="Assets\Medieval Mega Pack\Rock_Cover_Standard.shader" />
+     <None Include="Assets\BadDog\ForwardSSRWater_URP\Shaders\BGWaterOrtho.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shaders\Particles\Includes\Lux URP Particles Simple Lit Inputs.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shader Graphs\Includes\Lux_Advanced_Parallax.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shaders\Includes\Lux URP Blend Lighting.hlsl" />
+     <None Include="Assets\BadDog\ForwardSSRWater_LWRP\Shaders\BGWaterOrtho.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shader Graphs\Includes\Lux_Camera_Fade.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shaders\Vegetation\Lux URP Foliage.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Lit Extended\Includes\Lux URP Lit Extended Inputs.hlsl" />
@@ -501,12 +510,15 @@
      <None Include="Assets\Lux URP Essentials\Shaders\Human\Lux URP Hair.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Vegetation\Lux URP Wind Visualize.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Glass\Lux URP Glass.shader" />
+     <None Include="Assets\BadDog\ForwardSSRWater_LWRP\Shaders\BGWaterLighting.hlsl" />
      <None Include="Assets\SWS\Examples\Assets\Shaders\DiffuseReflectiveShader.shader" />
      <None Include="Assets\Lux URP Essentials\Lux SRP Grass Displacement\Shaders\Debug\DebugDisplacement.shader" />
      <None Include="Assets\Fantasy Horde - Orc\Polygonmaker - Shader\Unity Standard\ToonBasicOutline_modified.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Includes\Lux URP Toon Lighting.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shaders\Human\Lux URP Skin.shader" />
+     <None Include="Assets\BadDog\ForwardSSRWater_URP\Shaders\BGWaterStruct.hlsl" />
      <None Include="Assets\Lux URP Essentials\Shaders\Tree Creator\Lux URP Tree Creator Leaves Optimized.shader" />
+     <None Include="Assets\BadDog\ForwardSSRWater_URP\Shaders\BGWaterLighting.hlsl" />
      <None Include="Assets\Malbers Animations\Common\Shaders\Mask8Realistic.shader" />
      <None Include="Assets\Lux URP Essentials\Shaders\Terrain\Lux URP Terrain BaseMapGen.shader" />
      <None Include="Assets\Malbers Animations\Common\Fonts\OpenSans\License!.txt" />
