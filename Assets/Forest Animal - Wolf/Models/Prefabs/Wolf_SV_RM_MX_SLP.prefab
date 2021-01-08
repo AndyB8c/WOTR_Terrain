@@ -1,0 +1,1445 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3800892893704421616
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002832}
+  - component: {fileID: 3800892893701311582}
+  m_Layer: 0
+  m_Name: Wolf_SLP
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002832
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421616}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002838}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!137 &3800892893701311582
+SkinnedMeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421616}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: da7b188387a801d40bcb4f22e8e5e439, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  serializedVersion: 2
+  m_Quality: 0
+  m_UpdateWhenOffscreen: 0
+  m_SkinnedMotionVectors: 1
+  m_Mesh: {fileID: 4300002, guid: 37d83097be0e28d419ba164f6d683a5f, type: 3}
+  m_Bones:
+  - {fileID: 3800892893704002870}
+  - {fileID: 3800892893704002868}
+  - {fileID: 3800892893704002858}
+  - {fileID: 3800892893704002856}
+  - {fileID: 3800892893704002862}
+  - {fileID: 3800892893704002940}
+  - {fileID: 3800892893704002926}
+  - {fileID: 3800892893704002924}
+  - {fileID: 3800892893704002922}
+  - {fileID: 3800892893704002920}
+  - {fileID: 3800892893704002902}
+  - {fileID: 3800892893704002880}
+  - {fileID: 3800892893704002886}
+  - {fileID: 3800892893704002892}
+  - {fileID: 3800892893704002882}
+  - {fileID: 3800892893704002908}
+  - {fileID: 3800892893704002898}
+  - {fileID: 3800892893704002896}
+  - {fileID: 3800892893704002936}
+  - {fileID: 3800892893704002942}
+  - {fileID: 3800892893704002932}
+  - {fileID: 3800892893704002894}
+  - {fileID: 3800892893704002934}
+  - {fileID: 3800892893704002888}
+  - {fileID: 3800892893704002916}
+  - {fileID: 3800892893704002906}
+  - {fileID: 3800892893704002904}
+  - {fileID: 3800892893704002912}
+  - {fileID: 3800892893704002918}
+  - {fileID: 3800892893704002878}
+  - {fileID: 3800892893704002876}
+  - {fileID: 3800892893704002866}
+  - {fileID: 3800892893704002874}
+  - {fileID: 3800892893704002872}
+  - {fileID: 3800892893704002860}
+  - {fileID: 3800892893704002850}
+  - {fileID: 3800892893704002848}
+  - {fileID: 3800892893704002854}
+  - {fileID: 3800892893704002852}
+  - {fileID: 3800892893704002842}
+  m_BlendShapeWeights: []
+  m_RootBone: {fileID: 3800892893704002870}
+  m_AABB:
+    m_Center: {x: 0.13637659, y: -0.17350292, z: 0.00033402443}
+    m_Extent: {x: 0.36772832, y: 0.77450395, z: 0.13950926}
+  m_DirtyAABB: 0
+--- !u!1 &3800892893704421622
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002838}
+  - component: {fileID: 3800892893697045146}
+  m_Layer: 0
+  m_Name: Wolf_SV_RM_MX_SLP
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002838
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421622}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002846}
+  - {fileID: 3800892893704002832}
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &3800892893697045146
+Animator:
+  serializedVersion: 3
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421622}
+  m_Enabled: 1
+  m_Avatar: {fileID: 9000000, guid: 37d83097be0e28d419ba164f6d683a5f, type: 3}
+  m_Controller: {fileID: 9100000, guid: 10d0a550df02541648d27ad68a0e2a2a, type: 2}
+  m_CullingMode: 1
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 1
+  m_LinearVelocityBlending: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!1 &3800892893704421626
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002842}
+  m_Layer: 0
+  m_Name: Dalmatian_Tail_01_06SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002842
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421626}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.08104761, y: -0.00010357562, z: 0.000034952427}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002852}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -2.0148335, y: 10.163753, z: 1.2192501}
+--- !u!1 &3800892893704421630
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002846}
+  m_Layer: 0
+  m_Name: RootMotion
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002846
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421630}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002870}
+  m_Father: {fileID: 3800892893704002838}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &3800892893704421632
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002848}
+  m_Layer: 0
+  m_Name: Dalmatian_Tail_01_03SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002848
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421632}
+  m_LocalRotation: {x: 0, y: 0, z: 0.01663339, w: 0.99986166}
+  m_LocalPosition: {x: -0.093347274, y: 0.0004866995, z: 4.504984e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002854}
+  m_Father: {fileID: 3800892893704002850}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -0.61689067, y: 10.423101, z: -6.667886}
+--- !u!1 &3800892893704421634
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002850}
+  m_Layer: 0
+  m_Name: Dalmatian_Tail_01_02SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002850
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421634}
+  m_LocalRotation: {x: 0, y: 0, z: 0.021148963, w: 0.99977636}
+  m_LocalPosition: {x: -0.08722456, y: -0.0032403162, z: 4.313166e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002848}
+  m_Father: {fileID: 3800892893704002860}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -2.355486, y: 10.174847, z: 0.97451407}
+--- !u!1 &3800892893704421636
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002852}
+  m_Layer: 0
+  m_Name: Dalmatian_Tail_01_05SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002852
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421636}
+  m_LocalRotation: {x: -0.025172554, y: -0.0007129842, z: -0.0051743407, w: 0.9996695}
+  m_LocalPosition: {x: -0.08001961, y: 0.002315791, z: -0.000076285694}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002842}
+  m_Father: {fileID: 3800892893704002854}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -4.7500463, y: 10.146601, z: 0.12508993}
+--- !u!1 &3800892893704421638
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002854}
+  m_Layer: 0
+  m_Name: Dalmatian_Tail_01_04SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002854
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421638}
+  m_LocalRotation: {x: -0.01914703, y: 0.0046578366, z: 0.0034360483, w: 0.9997999}
+  m_LocalPosition: {x: -0.07571623, y: -0.0023898797, z: 3.460023e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002852}
+  m_Father: {fileID: 3800892893704002848}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -2.7101521, y: 10.939616, z: -6.8973536}
+--- !u!1 &3800892893704421640
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002856}
+  m_Layer: 0
+  m_Name: Dalmatian_Spine_03SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002856
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421640}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.12590955, y: 7.105427e-17, z: 5.5915073e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002862}
+  m_Father: {fileID: 3800892893704002858}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 2.4084852, y: -7.0108466, z: -16.917273}
+--- !u!1 &3800892893704421642
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002858}
+  m_Layer: 0
+  m_Name: Dalmatian_Spine_02SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002858
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421642}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.12590955, y: -7.105427e-17, z: 5.5915073e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002856}
+  m_Father: {fileID: 3800892893704002868}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 3.8223572, y: -8.259453, z: -4.1825147}
+--- !u!1 &3800892893704421644
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002860}
+  m_Layer: 0
+  m_Name: Dalmatian_Tail_01_01SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002860
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421644}
+  m_LocalRotation: {x: -0.68877673, y: 0.7249735, z: 4.4391825e-17, w: -4.217541e-17}
+  m_LocalPosition: {x: -0.022443915, y: 0.05298113, z: -3.624639e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002850}
+  m_Father: {fileID: 3800892893704002870}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 1.0638891, y: -169.61261, z: -20.131136}
+--- !u!1 &3800892893704421646
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002862}
+  m_Layer: 0
+  m_Name: Dalmatian_Spine_TopSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002862
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421646}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.12590955, y: -1.4210854e-16, z: 5.5915073e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002940}
+  - {fileID: 3800892893704002908}
+  - {fileID: 3800892893704002902}
+  m_Father: {fileID: 3800892893704002856}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -0.05098483, y: 0.68390054, z: 36.417336}
+--- !u!1 &3800892893704421650
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002866}
+  m_Layer: 0
+  m_Name: Dalmatian_r_HindLeg_Knee2SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002866
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421650}
+  m_LocalRotation: {x: 0, y: 0.3734507, z: -0, w: 0.92765003}
+  m_LocalPosition: {x: 0.23006591, y: 1.5099033e-16, z: -7.105427e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002874}
+  m_Father: {fileID: 3800892893704002876}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 13.142721, y: 47.04971, z: 6.0972943}
+--- !u!1 &3800892893704421652
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002868}
+  m_Layer: 0
+  m_Name: Dalmatian_Spine_01SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002868
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421652}
+  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 2.842171e-16, y: -0.12590955, z: 5.5915073e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002858}
+  m_Father: {fileID: 3800892893704002870}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: -0.11608202, y: 3.5437527, z: 96.64336}
+--- !u!1 &3800892893704421654
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002870}
+  m_Layer: 0
+  m_Name: Dalmatian_ROOTSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002870
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421654}
+  m_LocalRotation: {x: -0.5, y: 0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: -1.5777218e-32, y: 0.4927674, z: -0.23191404}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002916}
+  - {fileID: 3800892893704002878}
+  - {fileID: 3800892893704002868}
+  - {fileID: 3800892893704002860}
+  m_Father: {fileID: 3800892893704002846}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -6.8931327, y: 100.07356, z: -91.221436}
+--- !u!1 &3800892893704421656
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002872}
+  m_Layer: 0
+  m_Name: Dalmatian_r_HindLeg_BallSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002872
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421656}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 0.04840707, y: 1.7763568e-17, z: -0.03314684}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002874}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &3800892893704421658
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002874}
+  m_Layer: 0
+  m_Name: Dalmatian_r_HindLeg_AnkleSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002874
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421658}
+  m_LocalRotation: {x: 0, y: -0.04301339, z: -0, w: 0.9990745}
+  m_LocalPosition: {x: 0.10545847, y: 0, z: 1.4210854e-16}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002872}
+  m_Father: {fileID: 3800892893704002866}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0.21822882, y: 10.818931, z: -4.241152}
+--- !u!1 &3800892893704421660
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002876}
+  m_Layer: 0
+  m_Name: Dalmatian_r_HindLeg_Knee1SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002876
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421660}
+  m_LocalRotation: {x: 0, y: -0.5032048, z: -0, w: 0.86416715}
+  m_LocalPosition: {x: 0.13400969, y: -7.9936054e-17, z: -6.217249e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002866}
+  m_Father: {fileID: 3800892893704002878}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: -67.569, z: 0}
+--- !u!1 &3800892893704421662
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002878}
+  m_Layer: 0
+  m_Name: Dalmatian_r_HindLeg_HipSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002878
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421662}
+  m_LocalRotation: {x: -0.6946999, y: 0.13187927, z: -0.13187927, w: 0.6946999}
+  m_LocalPosition: {x: 0.034410663, y: 3.5527136e-17, z: 0.068305396}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002876}
+  m_Father: {fileID: 3800892893704002870}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: -80.76768, y: 105.06588, z: -102.52195}
+--- !u!1 &3800892893704421664
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002880}
+  m_Layer: 0
+  m_Name: Dalmatian_r_FrontLeg_HipSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002880
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421664}
+  m_LocalRotation: {x: 0.16827959, y: -0.17081572, z: 0.6844734, w: 0.6884768}
+  m_LocalPosition: {x: 0.04491055, y: 0.06777862, z: -0.030600067}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002886}
+  m_Father: {fileID: 3800892893704002902}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 17.072983, y: 3.6330705, z: 95.9067}
+--- !u!1 &3800892893704421666
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002882}
+  m_Layer: 0
+  m_Name: Dalmatian_r_FrontLeg_BallSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002882
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421666}
+  m_LocalRotation: {x: -0.000000009879556, y: 0.65540016, z: -0.000000008573042, w: 0.7552818}
+  m_LocalPosition: {x: 0.05632988, y: -1.7763568e-17, z: -0.007839418}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002892}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -0.000046549103, y: 42.30077, z: -0.0002481864}
+--- !u!1 &3800892893704421670
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002886}
+  m_Layer: 0
+  m_Name: Dalmatian_r_FrontLeg_KneeSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002886
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421670}
+  m_LocalRotation: {x: 0, y: 0.24293679, z: -0, w: 0.9700421}
+  m_LocalPosition: {x: 0.14915511, y: -1.7763568e-17, z: -4.4408918e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002892}
+  m_Father: {fileID: 3800892893704002880}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 72.18557, z: 0}
+--- !u!1 &3800892893704421672
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002888}
+  m_Layer: 0
+  m_Name: Dalmatian_r_Ear_01SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002888
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421672}
+  m_LocalRotation: {x: -0.6209539, y: -0.117087424, z: 0.35575715, w: 0.6885809}
+  m_LocalPosition: {x: 0.013251004, y: 0.0074527506, z: 0.05404927}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002942}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: -50.51982, y: -71.53157, z: 92.18975}
+--- !u!1 &3800892893704421676
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002892}
+  m_Layer: 0
+  m_Name: Dalmatian_r_FrontLeg_AnkleSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002892
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421676}
+  m_LocalRotation: {x: 0.06344152, y: 0.067440666, z: 0.007880201, w: 0.99567306}
+  m_LocalPosition: {x: 0.20029545, y: 1.4210854e-16, z: 1.0658141e-16}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002882}
+  m_Father: {fileID: 3800892893704002886}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 9.665067, y: 13.182038, z: -4.198485}
+--- !u!1 &3800892893704421678
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002894}
+  m_Layer: 0
+  m_Name: Dalmatian_r_Eye_01SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002894
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421678}
+  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.069474794, y: -0.072510265, z: 0.031794827}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002942}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+--- !u!1 &3800892893704421680
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002896}
+  m_Layer: 0
+  m_Name: Dalmatian_Neck_TopSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002896
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421680}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.011969006, y: -0.06441414, z: 3.3920937e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002936}
+  - {fileID: 3800892893704002942}
+  m_Father: {fileID: 3800892893704002898}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0.20425887, y: 3.332454, z: 1.9359736}
+--- !u!1 &3800892893704421682
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002898}
+  m_Layer: 0
+  m_Name: Dalmatian_Neck_02SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002898
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421682}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.011969006, y: -0.06441414, z: 3.0212798e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002896}
+  m_Father: {fileID: 3800892893704002908}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -2.0142841, y: -0.94496727, z: -16.869825}
+--- !u!1 &3800892893704421686
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002902}
+  m_Layer: 0
+  m_Name: Dalmatian_r_Clavicle_AuxSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002902
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421686}
+  m_LocalRotation: {x: 0.7071068, y: -4.3297806e-17, z: 0.7071068, w: 4.3297806e-17}
+  m_LocalPosition: {x: 1.4210854e-16, y: 2.842171e-16, z: 0.049276736}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002880}
+  m_Father: {fileID: 3800892893704002862}
+  m_RootOrder: 2
+  m_LocalEulerAnglesHint: {x: 7.01671e-15, y: 90, z: 180}
+--- !u!1 &3800892893704421688
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002904}
+  m_Layer: 0
+  m_Name: Dalmatian_l_HindLeg_Knee2SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002904
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421688}
+  m_LocalRotation: {x: 0, y: 0.3734507, z: -0, w: 0.92765003}
+  m_LocalPosition: {x: -0.23006591, y: 1.0658141e-16, z: -2.1316282e-16}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002912}
+  m_Father: {fileID: 3800892893704002906}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -6.1163316, y: 44.41606, z: -0.99598664}
+--- !u!1 &3800892893704421690
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002906}
+  m_Layer: 0
+  m_Name: Dalmatian_l_HindLeg_Knee1SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002906
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421690}
+  m_LocalRotation: {x: 0, y: -0.5032048, z: -0, w: 0.86416715}
+  m_LocalPosition: {x: -0.13400969, y: 7.105427e-17, z: 2.6645352e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002904}
+  m_Father: {fileID: 3800892893704002916}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: -63.935356, z: 0}
+--- !u!1 &3800892893704421692
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002908}
+  m_Layer: 0
+  m_Name: Dalmatian_Neck_01SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002908
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421692}
+  m_LocalRotation: {x: 0, y: -0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: -0.06441414, y: 0.011969006, z: 2.3326258e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002898}
+  m_Father: {fileID: 3800892893704002862}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: -5.1081867, y: 3.6386025, z: -82.602104}
+--- !u!1 &3800892893704421696
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002912}
+  m_Layer: 0
+  m_Name: Dalmatian_l_HindLeg_AnkleSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002912
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421696}
+  m_LocalRotation: {x: 0, y: -0.04301339, z: -0, w: 0.9990745}
+  m_LocalPosition: {x: -0.10545847, y: -2.6645352e-17, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002918}
+  m_Father: {fileID: 3800892893704002904}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: -4.20735, y: -38.329105, z: -10.584982}
+--- !u!1 &3800892893704421700
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002916}
+  m_Layer: 0
+  m_Name: Dalmatian_l_HindLeg_HipSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002916
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421700}
+  m_LocalRotation: {x: -0.13187928, y: -0.6946999, z: 0.6946999, w: 0.13187928}
+  m_LocalPosition: {x: 0.034410663, y: -3.5527136e-17, z: -0.068305396}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002906}
+  m_Father: {fileID: 3800892893704002870}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 31.637434, y: -90.762505, z: 89.54539}
+--- !u!1 &3800892893704421702
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002918}
+  m_Layer: 0
+  m_Name: Dalmatian_l_HindLeg_BallSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002918
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421702}
+  m_LocalRotation: {x: 0, y: 0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: -0.04840707, y: 2.6645352e-17, z: 0.03314684}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002912}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 90, z: 0}
+--- !u!1 &3800892893704421704
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002920}
+  m_Layer: 0
+  m_Name: Dalmatian_l_FrontLeg_BallSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002920
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421704}
+  m_LocalRotation: {x: -0.000000009931928, y: 0.65540016, z: -0.000000008618484, w: 0.7552818}
+  m_LocalPosition: {x: -0.05632988, y: 1.0658141e-16, z: 0.007839418}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002922}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0.0000014522176, y: 115.19994, z: -0.0000064968626}
+--- !u!1 &3800892893704421706
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002922}
+  m_Layer: 0
+  m_Name: Dalmatian_l_FrontLeg_AnkleSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002922
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421706}
+  m_LocalRotation: {x: 0.06344152, y: 0.067440666, z: 0.0078802, w: 0.99567306}
+  m_LocalPosition: {x: -0.20029545, y: -1.7763568e-17, z: -3.5527136e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002920}
+  m_Father: {fileID: 3800892893704002924}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 12.546469, y: 0.16925052, z: -2.4233546}
+--- !u!1 &3800892893704421708
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002924}
+  m_Layer: 0
+  m_Name: Dalmatian_l_FrontLeg_KneeSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002924
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421708}
+  m_LocalRotation: {x: 0, y: 0.24293679, z: -0, w: 0.9700421}
+  m_LocalPosition: {x: -0.14915511, y: 5.3290704e-17, z: 1.8651746e-16}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002922}
+  m_Father: {fileID: 3800892893704002926}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 12.543558, z: 0}
+--- !u!1 &3800892893704421710
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002926}
+  m_Layer: 0
+  m_Name: Dalmatian_l_FrontLeg_HipSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002926
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421710}
+  m_LocalRotation: {x: 0.16827959, y: -0.17081572, z: 0.6844734, w: 0.6884768}
+  m_LocalPosition: {x: -0.04491055, y: -0.06777862, z: 0.030600067}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002924}
+  m_Father: {fileID: 3800892893704002940}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 17.763996, y: 3.81213, z: 96.09433}
+--- !u!1 &3800892893704421716
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002932}
+  m_Layer: 0
+  m_Name: Dalmatian_l_Eye_01SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002932
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421716}
+  m_LocalRotation: {x: 0, y: 0, z: 0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: 0.069474794, y: -0.072510265, z: -0.031794827}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002942}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 90}
+--- !u!1 &3800892893704421718
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002934}
+  m_Layer: 0
+  m_Name: Dalmatian_l_Ear_01SHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002934
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421718}
+  m_LocalRotation: {x: 0.6209539, y: 0.117087424, z: 0.35575715, w: 0.6885809}
+  m_LocalPosition: {x: 0.013251004, y: 0.0074527506, z: -0.05404927}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002942}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 50.51982, y: 71.53157, z: 92.18975}
+--- !u!1 &3800892893704421720
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002936}
+  m_Layer: 0
+  m_Name: Dalmatian_Head_JawSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002936
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421720}
+  m_LocalRotation: {x: 0, y: 0, z: 0.79100734, w: 0.6118067}
+  m_LocalPosition: {x: 0.03920505, y: -0.07267135, z: 0.00027666806}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 3800892893704002896}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 84.27523}
+--- !u!1 &3800892893704421724
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002940}
+  m_Layer: 0
+  m_Name: Dalmatian_l_Clavicle_AuxSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002940
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421724}
+  m_LocalRotation: {x: -0, y: -0.7071068, z: 0, w: 0.7071068}
+  m_LocalPosition: {x: 7.105427e-17, y: 2.842171e-16, z: -0.049276736}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002926}
+  m_Father: {fileID: 3800892893704002862}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: 0}
+--- !u!1 &3800892893704421726
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3800892893704002942}
+  m_Layer: 0
+  m_Name: Dalmatian_Head_TopSHJnt
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3800892893704002942
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3800892893704421726}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0.09886994, y: -0.066071875, z: 8.7551694e-17}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 3800892893704002934}
+  - {fileID: 3800892893704002932}
+  - {fileID: 3800892893704002888}
+  - {fileID: 3800892893704002894}
+  m_Father: {fileID: 3800892893704002896}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}

@@ -64,8 +64,8 @@
     <Compile Include="Assets\Standard Assets\Characters\ThirdPersonCharacter\Scripts\AICharacterControl.cs" />
     <Compile Include="Assets\Standard Assets\CrossPlatformInput\Scripts\CrossPlatformInputManager.cs" />
     <Compile Include="Assets\Standard Assets\CrossPlatformInput\Scripts\InputAxisScrollbar.cs" />
-    <Compile Include="Assets\Standard Assets\Characters\ThirdPersonCharacter\Scripts\ThirdPersonCharacter.cs" />
     <Compile Include="Assets\Standard Assets\CrossPlatformInput\Scripts\MobileControlRig.cs" />
+    <Compile Include="Assets\Standard Assets\Characters\ThirdPersonCharacter\Scripts\ThirdPersonCharacter.cs" />
     <Compile Include="Assets\Standard Assets\CrossPlatformInput\Scripts\AxisTouchButton.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -793,6 +793,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="MeshBakerEditor.csproj">
+      <Project>{31A35D93-EBE3-19BF-7009-7574EA6F14EF}</Project>
+      <Name>MeshBakerEditor</Name>
+    </ProjectReference>
+    <ProjectReference Include="MeshBakerCore.csproj">
+      <Project>{D5ADFD53-7EBE-C988-D4DB-95705762DCE0}</Project>
+      <Name>MeshBakerCore</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="GenerateTargetFrameworkMonikerAttribute" />
