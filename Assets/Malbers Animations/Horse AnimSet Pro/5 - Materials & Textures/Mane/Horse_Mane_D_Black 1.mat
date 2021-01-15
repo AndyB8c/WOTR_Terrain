@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-2213893507519688235
+--- !u!114 &-3328936021341949959
 MonoBehaviour:
   m_ObjectHideFlags: 11
   m_CorrespondingSourceObject: {fileID: 0}
@@ -34,7 +34,7 @@ Material:
     serializedVersion: 3
     m_TexEnvs:
     - _AlbedoRGBOpacityA:
-        m_Texture: {fileID: 2800000, guid: 406e4c0b48cb4a94a9bbcb031b1fd047, type: 3}
+        m_Texture: {fileID: 2800000, guid: e17d49c5fbaa5c941b813e5451f1d011, type: 3}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _BaseMap:
@@ -107,8 +107,8 @@ Material:
         m_Offset: {x: 0, y: 0}
     m_Floats:
     - _AlphaClip: 1
-    - _AnisotropyFalloff: 131
-    - _AnisotropyOffset: -0.18
+    - _AnisotropyFalloff: 76
+    - _AnisotropyOffset: -0.33
     - _Blend: 0
     - _BumpScale: 1
     - _ClearCoatMask: 0
@@ -122,15 +122,14 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.604
     - _GlossyReflections: 1
-    - _Metallic: 0
+    - _Metallic: 0.08
     - _Mode: 1
     - _NormalAmount: 0.17
     - _OcclusionStrength: 1
     - _Parallax: 0.02
     - _QueueOffset: 0
     - _ReceiveShadows: 1
-    - _SmoothMult: 0.64
-    - _Smoothness: 0.5
+    - _Smoothness: 0.604
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1
@@ -140,10 +139,10 @@ Material:
     - _ZWrite: 1
     - __dirty: 0
     m_Colors:
-    - _AlbedoTint: {r: 0.18867922, g: 0.18867922, b: 0.18867922, a: 1}
-    - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
+    - _AlbedoTint: {r: 0.009433985, g: 0.009433985, b: 0.009433985, a: 1}
+    - _BaseColor: {r: 0, g: 0, b: 0, a: 1}
     - _Color: {r: 0, g: 0, b: 0, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.2, g: 0.2, b: 0.2, a: 1}
-    - _SpecularTint: {r: 1, g: 1, b: 1, a: 1}
+    - _SpecularTint: {r: 0.4716981, g: 0.4716981, b: 0.4716981, a: 1}
   m_BuildTextureStacks: []
