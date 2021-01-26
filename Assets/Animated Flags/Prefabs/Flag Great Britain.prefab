@@ -1,0 +1,162 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &100000
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 400000}
+  - component: {fileID: 3300000}
+  - component: {fileID: 2300000}
+  - component: {fileID: 11400000}
+  m_Layer: 0
+  m_Name: Flag Great Britain
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &400000
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1.5, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!33 &3300000
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Mesh: {fileID: 4301400, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+--- !u!23 &2300000
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_MotionVectors: 1
+  m_LightProbeUsage: 0
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 9c8ffd0eabc408347bbad3b50b9fc87f, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 100000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ca5a43a5876758f4e9fb406905746835, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  meshCache:
+  - {fileID: 3301350, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301372, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301394, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301416, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301428, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301430, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301432, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301434, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301436, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301352, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301354, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301356, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301358, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301360, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301362, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301364, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301366, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301368, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301370, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301374, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301376, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301378, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301380, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301382, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301384, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301386, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301388, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301390, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301392, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301396, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301398, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301400, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301402, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301404, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301406, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301408, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301410, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301412, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301414, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301418, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301420, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301422, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301424, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  - {fileID: 3301426, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  meshCached: {fileID: 400000, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  meshContainerFBX: {fileID: 400000, guid: bc54d55ca261e3d4bb226b1e55825709, type: 3}
+  playSpeed: 24
+  playSpeedRandom: 0
+  randomSpeedLoop: 0
+  currentFrame: 25.797281
+  meshCacheCount: 44
+  meshFilter: {fileID: 3300000}
+  rendererComponent: {fileID: 2300000}
+  updateInterval: 0.05
+  randomRotateX: 0
+  randomRotateY: 0
+  randomRotateZ: 0
+  randomStartFrame: 1
+  randomRotateLoop: 0
+  loop: 1
+  pingPong: 0
+  playOnAwake: 1
+  randomStartDelay: {x: 0, y: 0}
+  transformCache: {fileID: 400000}
+  delta: 0

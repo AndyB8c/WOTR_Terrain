@@ -1,6 +1,10 @@
 ﻿using System;
+using System.Linq;
+using System.Collections.Generic;
 using UnityEngine;
 #if UNITY_EDITOR
+using UnityEditor.PackageManager.Requests;
+using UnityEditor.PackageManager;
 using UnityEditor;
 #endif
 namespace MalbersAnimations
@@ -12,6 +16,8 @@ namespace MalbersAnimations
         public string title;
         public Section[] sections;
 
+        public List<string> packages = new List<string>() { "com.unity.cinemachine" , "com.unity.mathematics" };
+
         [Serializable]
         public class Section
         {
@@ -19,13 +25,23 @@ namespace MalbersAnimations
         }
     }
 
-     
+
 
 #if UNITY_EDITOR
     [CustomEditor(typeof(Readme))]
     public class ReadmeEditor : Editor
     {
         static float kSpace = 16f;
+        private ListRequest list;
+        private AddRequest add;
+
+
+        private void OnEnable()
+        {
+            list = Client.List();
+        }
+
+        bool HasPackage(string id) => id.Contains('@') ? list.Result.Any(x => x.packageId == id) : list.Result.Any(x => x.packageId.Split('@')[0] == id);
 
         protected override void OnHeaderGUI()
         {
@@ -45,6 +61,11 @@ namespace MalbersAnimations
         public override void OnInspectorGUI()
         {
             var readme = (Readme)target;
+
+            EditorGUILayout.BeginVertical(EditorStyles.helpBox);
+            DrawPackageDependencies(readme);
+            EditorGUILayout.EndVertical();
+
             Init();
 
             foreach (var section in readme.sections)
@@ -72,6 +93,53 @@ namespace MalbersAnimations
             }
         }
 
+        private void DrawPackageDependencies(Readme readme)
+        {
+            GUILayout.Label("Package Dependencies", EditorStyles.boldLabel);
+
+            // We are adding a new package, wait for the operation to finish and then relist.
+            if (add != null && add.IsCompleted)
+            {
+                add = null;
+                list = Client.List();
+            }
+
+            if (add != null || !list.IsCompleted)
+                Repaint();// Keep refreshing while we are waiting for Packman to resolve our request.
+            else
+            {
+                if (!readme.packages.All(x => HasPackage(x)))
+                    EditorGUILayout.HelpBox($"This Asset requires the following packages to be installed in your Project. \nPlease install all the required packages!", MessageType.Warning);
+            }
+
+
+            foreach (var req in readme.packages)
+            {
+                Rect rect = EditorGUILayout.GetControlRect(true, 20);
+
+                GUI.Label(rect, new GUIContent(req), EditorStyles.label);
+                rect.width -= 160;
+                rect.x += 160;
+                if (add != null || !list.IsCompleted)
+                {
+                    using (new EditorGUI.DisabledScope(true))
+                    {
+                        GUI.Label(rect, "checking…", EditorStyles.label);
+                    }
+                }
+                else if (HasPackage(req))
+                {
+                    GUI.Label(rect, $"OK \u2713", EditorStyles.boldLabel);
+                }
+                else
+                {
+                    GUI.Label(rect, "Missing \u2717", EditorStyles.label);
+                    rect.x += rect.width - 80;
+                    rect.width = 80;
+                    if (GUI.Button(rect, "Install")) add = Client.Add(req);
+                }
+            }
+        }
 
         bool m_Initialized;
 

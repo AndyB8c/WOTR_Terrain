@@ -2,7 +2,7 @@
 
 namespace MalbersAnimations
 {
-    public class UnityUtils : MonoBehaviour
+    public class UnityUtils : MonoBehaviour, IAnimatorListener
     {
         public virtual void Freeze_Time(bool value) => Time.timeScale = value ? 0 : 1;
 
@@ -53,8 +53,13 @@ namespace MalbersAnimations
         {
             Cursor.lockState = !value ? CursorLockMode.Locked : CursorLockMode.None;  // Lock or unlock the cursor.
             Cursor.visible = value;
-        } 
+        }
+
+
+        public virtual bool OnAnimatorBehaviourMessage(string message, object value) =>
+          this.InvokeWithParams(message, value);
     }
+
     /// <summary> Used to store Transform pos, rot and scale values </summary>
     [System.Serializable]
     public struct TransformOffset
@@ -71,4 +76,5 @@ namespace MalbersAnimations
             Scale = Vector3.one;
         }
     }
+
 }

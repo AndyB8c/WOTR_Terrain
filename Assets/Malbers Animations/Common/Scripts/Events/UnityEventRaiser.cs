@@ -10,16 +10,16 @@ namespace MalbersAnimations.Events
         public float Delayed;
         public float RepeatTime;
         public bool Repeat;
-        public string desc;
+
 
         [FormerlySerializedAs("OnEnableEvent")]
         public UnityEngine.Events.UnityEvent onEnable;
 
 
         public string Description = "";
-        [HideInInspector] public bool editDescription = false;
-        [ContextMenu("Edit Description")]
-        internal void EditDescription() => editDescription ^= true;
+        [HideInInspector] public bool ShowDescription = false;
+        [ContextMenu("Show Description")]
+        internal void EditDescription() => ShowDescription ^= true;
 
         public void OnEnable()
         {
@@ -40,8 +40,11 @@ namespace MalbersAnimations.Events
         [ContextMenu("Invoke on Editor")]
         private void StartEvent() => onEnable.Invoke();
 
-
-        private void OnDisable() => CancelInvoke();
+        private void OnDisable()
+        {
+            CancelInvoke();
+            StopAllCoroutines();
+        }
     }
 
 
@@ -53,15 +56,15 @@ namespace MalbersAnimations.Events
     [UnityEditor.CustomEditor(typeof(UnityEventRaiser))]
     public class UnityEventRaiserInspector : UnityEditor.Editor
     {
-        UnityEditor.SerializedProperty Delayed, Repeat, RepeatTime, OnEnableEvent, editDescription, Description;
+        UnityEditor.SerializedProperty Delayed, Repeat, RepeatTime, OnEnableEvent, ShowDescription, Description;
         public static GUIStyle StyleBlue => Style(new Color(0, 0.5f, 1f, 0.3f));
-
+        private GUIStyle style;
 
 
         private void OnEnable()
         {
             Delayed = serializedObject.FindProperty("Delayed");
-            editDescription = serializedObject.FindProperty("editDescription");
+            ShowDescription = serializedObject.FindProperty("ShowDescription");
             Description = serializedObject.FindProperty("Description");
             Repeat = serializedObject.FindProperty("Repeat");
             RepeatTime = serializedObject.FindProperty("RepeatTime");
@@ -72,13 +75,18 @@ namespace MalbersAnimations.Events
         {
             serializedObject.Update();
 
-            if (editDescription.boolValue)
-                UnityEditor.EditorGUILayout.PropertyField(Description);
-            else
-              if (!string.IsNullOrEmpty(Description.stringValue))
+
+            if (ShowDescription.boolValue)
             {
+                if (style == null)
+                    style = new GUIStyle(UnityEditor.EditorStyles.helpBox)
+                    {
+                        fontSize = 12,
+                        fontStyle = FontStyle.Bold,  
+                    };
+
                 UnityEditor.EditorGUILayout.BeginVertical(StyleBlue);
-                UnityEditor.EditorGUILayout.HelpBox(Description.stringValue, UnityEditor.MessageType.None);
+                Description.stringValue = UnityEditor.EditorGUILayout.TextArea(Description.stringValue, style);
                 UnityEditor.EditorGUILayout.EndVertical();
             }
 
@@ -89,12 +97,12 @@ namespace MalbersAnimations.Events
             if (Repeat.boolValue)
             {
 
-                UnityEditor.EditorGUIUtility.labelWidth = 40;
-                UnityEditor.EditorGUILayout.PropertyField(RepeatTime,new GUIContent("RT","Repeat Time") ,GUILayout.MinWidth(40));
+                UnityEditor.EditorGUIUtility.labelWidth = 20;
+                UnityEditor.EditorGUILayout.PropertyField(RepeatTime, new GUIContent("RT", "Repeat Time"), GUILayout.MinWidth(40));
                 UnityEditor.EditorGUIUtility.labelWidth = 0;
             }
-            
-            Repeat.boolValue = GUILayout.Toggle(Repeat.boolValue, new GUIContent("Repeat"), UnityEditor.EditorStyles.miniButton, GUILayout.Width(47));
+
+            Repeat.boolValue = GUILayout.Toggle(Repeat.boolValue, new GUIContent("R","Repeat"), UnityEditor.EditorStyles.miniButton, GUILayout.Width(25));
             UnityEditor.EditorGUILayout.EndHorizontal();
             UnityEditor.EditorGUILayout.PropertyField(OnEnableEvent);
             serializedObject.ApplyModifiedProperties();
@@ -105,25 +113,21 @@ namespace MalbersAnimations.Events
         {
             GUIStyle currentStyle = new GUIStyle(GUI.skin.box) { border = new RectOffset(-1, -1, -1, -1) };
 
-
             Color[] pix = new Color[1];
             pix[0] = color;
             Texture2D bg = new Texture2D(1, 1);
             bg.SetPixels(pix);
             bg.Apply();
 
-
             currentStyle.normal.background = bg;
 
-#if UNITY_2019 || UNITY_2020
             // MW 04-Jul-2020: Check if system supports newer graphics formats used by Unity GUI
             Texture2D bgActual = currentStyle.normal.scaledBackgrounds[0];
 
             if (SystemInfo.IsFormatSupported(bgActual.graphicsFormat, UnityEngine.Experimental.Rendering.FormatUsage.Sample) == false)
             {
-                currentStyle.normal.scaledBackgrounds = new Texture2D[] { }; // This can't be null
+                currentStyle.normal.scaledBackgrounds = System.Array.Empty<Texture2D>(); // This can't be null
             }
-#endif
             return currentStyle;
         }
     }
